@@ -56,6 +56,7 @@ apps:
       - gsettings
       - pulseaudio
       - opengl
+      - removable-media
     environment:
       DISABLE_WAYLAND: '1'
       GTK_USE_PORTAL: "1"
