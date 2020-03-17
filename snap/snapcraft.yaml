@@ -24,6 +24,7 @@ parts:
       - libxss1
       - libnspr4
       - libnss3
+      - libappindicator3-1
     override-build: |
       set -xeu
       echo "Get GitHub releases..."
