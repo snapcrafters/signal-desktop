@@ -38,7 +38,7 @@ parts:
       sed -i 's|Icon=signal-desktop|Icon=${SNAP}/usr/share/icons/hicolor/512x512/apps/signal-desktop.png|' $SNAPCRAFT_PART_INSTALL/usr/share/applications/signal-desktop.desktop
       snapcraftctl set-version "$VERSION"
     prime:
-      - -opt/Signal/crome-sandbox
+      - -opt/Signal/chrome-sandbox
 
 apps:
   signal-desktop:
