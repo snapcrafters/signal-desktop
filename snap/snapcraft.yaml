@@ -46,17 +46,12 @@ apps:
     desktop: usr/share/applications/signal-desktop.desktop
     command: opt/Signal/signal-desktop --use-tray-icon --no-sandbox
     plugs:
-      - desktop
-      - desktop-legacy
-      - home
-      - x11
-      - wayland
-      - unity7
       - browser-support
+      - home
       - network
-      - gsettings
-      - pulseaudio
       - opengl
+      - pulseaudio
+      - unity7
     environment:
       DISABLE_WAYLAND: '1'
       GTK_USE_PORTAL: "1"
