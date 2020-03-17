@@ -39,6 +39,14 @@ parts:
       snapcraftctl set-version "$VERSION"
     prime:
       - -opt/Signal/chrome-sandbox
+  cleanup:
+    after: [ signal-desktop ]
+    plugin: nil
+    build-snaps: [ gnome-3-28-1804 ]
+    override-prime: |
+        set -eux
+        cd /snap/gnome-3-28-1804/current
+        find . -type f,l -exec rm -f $SNAPCRAFT_PRIME/{} \;
 
 apps:
   signal-desktop:
