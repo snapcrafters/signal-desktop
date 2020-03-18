@@ -12,7 +12,17 @@ architectures:
   - build-on: amd64
 
 parts:
+  libappindicator:
+    plugin: nil
+    stage-packages:
+      - libappindicator3-1
+    prime:
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libdbusmenu*.so*
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libappindicator*.so*
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libindicator*.so*
+
   signal-desktop:
+    after: [libappindicator]
     plugin: nil
     #source: https://updates.signal.org/desktop/apt/pool/main/s/signal-desktop/signal-desktop_1.30.0_amd64.deb
     build-packages:
@@ -24,7 +34,6 @@ parts:
       - libxss1
       - libnspr4
       - libnss3
-      - libappindicator3-1
     override-build: |
       set -xeu
       echo "Get GitHub releases..."
