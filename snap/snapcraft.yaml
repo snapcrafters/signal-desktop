@@ -12,7 +12,17 @@ architectures:
   - build-on: amd64
 
 parts:
+  libappindicator:
+    plugin: nil
+    stage-packages:
+      - libappindicator3-1
+    prime:
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libdbusmenu*.so*
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libappindicator*.so*
+      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libindicator*.so*
+
   signal-desktop:
+    after: [libappindicator]
     plugin: nil
     #source: https://updates.signal.org/desktop/apt/pool/main/s/signal-desktop/signal-desktop_1.30.0_amd64.deb
     build-packages:
@@ -37,7 +47,15 @@ parts:
       sed -i 's|Icon=signal-desktop|Icon=${SNAP}/usr/share/icons/hicolor/512x512/apps/signal-desktop.png|' $SNAPCRAFT_PART_INSTALL/usr/share/applications/signal-desktop.desktop
       snapcraftctl set-version "$VERSION"
     prime:
-      - -opt/Signal/crome-sandbox
+      - -opt/Signal/chrome-sandbox
+  cleanup:
+    after: [ signal-desktop ]
+    plugin: nil
+    build-snaps: [ gnome-3-28-1804 ]
+    override-prime: |
+        set -eux
+        cd /snap/gnome-3-28-1804/current
+        find . -type f,l -exec rm -f $SNAPCRAFT_PRIME/{} \;
 
 apps:
   signal-desktop:
@@ -45,24 +63,16 @@ apps:
     desktop: usr/share/applications/signal-desktop.desktop
     command: opt/Signal/signal-desktop --use-tray-icon --no-sandbox
     plugs:
-      - desktop
-      - desktop-legacy
-      - home
-      - x11
-      - wayland
-      - unity7
       - browser-support
+      - home
       - network
-      - gsettings
-      - pulseaudio
       - opengl
+      - pulseaudio
       - removable-media
+      - unity7
     environment:
       DISABLE_WAYLAND: '1'
       GTK_USE_PORTAL: "1"
       TMPDIR: $XDG_RUNTIME_DIR
-      PATH: '$SNAP/usr/sbin:$SNAP/usr/bin:$SNAP/sbin:$SNAP/bin:$PATH'
-      SNAP_DESKTOP_RUNTIME: $SNAP/gnome-platform
-      LD_LIBRARY_PATH: '$SNAP_LIBRARY_PATH:$SNAP/lib:$SNAP/usr/lib:$SNAP/lib/x86_64-linux-gnu:$SNAP/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH:$SNAP/lib:$SNAP/usr/lib:$SNAP/lib/x86_64-linux-gnu:$SNAP/usr/lib/x86_64-linux-gnu'
       WAYLAND_DISPLAY: no-display
       XDG_CURRENT_DESKTOP: Unity
