@@ -59,6 +59,7 @@ apps:
       - network
       - opengl
       - pulseaudio
+      - removable-media
       - unity7
     environment:
       DISABLE_WAYLAND: '1'
