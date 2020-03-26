@@ -67,8 +67,7 @@ apps:
   signal-desktop:
     extensions: [gnome-3-28]
     desktop: usr/share/applications/signal-desktop.desktop
-    # https://github.com/signalapp/Signal-Desktop/issues/4085 - remove use-tray-icon until fixed upstream
-    command: opt/Signal/signal-desktop --no-sandbox
+    command: opt/Signal/signal-desktop --use-tray-icon --no-sandbox
     plugs:
       - browser-support
       - home
