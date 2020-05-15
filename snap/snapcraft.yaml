@@ -73,9 +73,11 @@ apps:
       - home
       - network
       - opengl
-      - pulseaudio
+      - audio-playback
       - removable-media
       - unity7
+      - desktop
+      - desktop-legacy
     environment:
       DISABLE_WAYLAND: '1'
       GTK_USE_PORTAL: "1"
