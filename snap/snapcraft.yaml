@@ -48,7 +48,6 @@ parts:
       snapcraftctl set-version "$VERSION"
     prime:
       - -opt/Signal/chrome-sandbox
-      - -opt/Signal/resources/app.asar.unpacked
 
   cleanup:
     after: [ signal-desktop ]
