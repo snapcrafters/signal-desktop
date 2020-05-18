@@ -86,4 +86,3 @@ apps:
       GTK_USE_PORTAL: "1"
       TMPDIR: $XDG_RUNTIME_DIR
       WAYLAND_DISPLAY: no-display
-      XDG_CURRENT_DESKTOP: Unity
