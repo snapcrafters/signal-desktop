@@ -26,6 +26,7 @@ parts:
     plugin: nil
     #source: https://updates.signal.org/desktop/apt/pool/main/s/signal-desktop/signal-desktop_1.30.0_amd64.deb
     build-packages:
+      - gcc
       - wget
       - jq
       - dpkg
