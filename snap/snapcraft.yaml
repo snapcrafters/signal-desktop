@@ -8,7 +8,7 @@ description: |
 grade: stable
 confinement: strict
 
-architectures: 
+architectures:
   - build-on: amd64
 
 parts:
