@@ -8,7 +8,7 @@ description: |
 grade: stable
 confinement: strict
 
-architectures: 
+architectures:
   - build-on: amd64
 
 parts:
@@ -26,6 +26,7 @@ parts:
     plugin: nil
     #source: https://updates.signal.org/desktop/apt/pool/main/s/signal-desktop/signal-desktop_1.30.0_amd64.deb
     build-packages:
+      - gcc
       - wget
       - jq
       - dpkg
@@ -34,6 +35,7 @@ parts:
       - libxss1
       - libnspr4
       - libnss3
+      - libvips42
     override-build: |
       set -xeu
       echo "Get GitHub releases..."
@@ -48,6 +50,8 @@ parts:
       snapcraftctl set-version "$VERSION"
     prime:
       - -opt/Signal/chrome-sandbox
+      - -opt/Signal/resources/app.asar.unpacked/node_modules/sharp/vendor/lib
+      - -opt/Signal/resources/app.asar.unpacked/node_modules/sharp/vendor/include
 
   cleanup:
     after: [ signal-desktop ]
@@ -82,4 +86,3 @@ apps:
       GTK_USE_PORTAL: "1"
       TMPDIR: $XDG_RUNTIME_DIR
       WAYLAND_DISPLAY: no-display
-      XDG_CURRENT_DESKTOP: Unity
