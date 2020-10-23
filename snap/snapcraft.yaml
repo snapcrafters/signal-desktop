@@ -73,10 +73,12 @@ apps:
     command: opt/Signal/signal-desktop --use-tray-icon --no-sandbox
     plugs:
       - browser-support
+      - camera
       - home
       - network
       - opengl
       - audio-playback
+      - audio-record
       - removable-media
       - unity7
       - desktop
