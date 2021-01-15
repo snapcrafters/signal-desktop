@@ -4,6 +4,7 @@ adopt-info: signal-desktop
 summary: Signal Desktop
 description: |
   Private messaging from your desktop.
+license: AGPL-3.0-only
 
 grade: stable
 confinement: strict
