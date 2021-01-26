@@ -1,5 +1,5 @@
 name: signal-desktop
-base: core18
+base: core20
 adopt-info: signal-desktop
 summary: Signal Desktop
 description: |
@@ -56,10 +56,10 @@ parts:
   cleanup:
     after: [ signal-desktop ]
     plugin: nil
-    build-snaps: [ gnome-3-28-1804 ]
+    build-snaps: [ gnome-3-38-2004 ]
     override-prime: |
         set -eux
-        cd /snap/gnome-3-28-1804/current
+        cd /snap/gnome-3-38-2004/current
         find . -type f,l -exec rm -f $SNAPCRAFT_PRIME/{} \;
         for CRUFT in bug lintian man; do
           rm -rf $SNAPCRAFT_PRIME/usr/share/$CRUFT
@@ -68,7 +68,7 @@ parts:
 
 apps:
   signal-desktop:
-    extensions: [gnome-3-28]
+    extensions: [gnome-3-38]
     desktop: usr/share/applications/signal-desktop.desktop
     command: opt/Signal/signal-desktop --use-tray-icon --no-sandbox
     plugs:
