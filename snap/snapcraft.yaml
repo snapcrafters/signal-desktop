@@ -1,10 +1,22 @@
 name: signal-desktop
-base: core18
-adopt-info: signal-desktop
-summary: Signal Desktop
+title: Signal Desktop
+summary: Private messaging from your desktop.
 description: |
   Private messaging from your desktop.
+  
+  To use the Signal desktop app, Signal must first be installed on your phone.
 
+  **Are you having issues?**
+
+  Let us know by creating a new issue here: https://github.com/snapcrafters/signal-desktop/issues
+
+  **Authors**
+
+  This snap is maintained by the Snapcrafters community, and is not necessarily endorsed or officially maintained by the upstream developers.
+license: AGPL-3.0-only
+adopt-info: signal-desktop
+
+base: core18
 grade: stable
 confinement: strict
 
