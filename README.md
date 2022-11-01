@@ -12,6 +12,8 @@
 
 ## Install
 
+### From snap store
+
 ```shell
 snap install signal-desktop
 ```
@@ -19,6 +21,20 @@ snap install signal-desktop
 ([Don't have snapd installed?](https://snapcraft.io/docs/core/install))
 
 <p align="center">Published for <img src="https://raw.githubusercontent.com/anythingcodes/slack-emoji-for-techies/gh-pages/emoji/tux.png" align="top" width="24" /> with :gift_heart: by Snapcrafters</p>
+
+### Building snap locally
+
+``` bash
+sudo snap install --classic snapcraft
+git clone https://github.com/snapcrafters/signal-desktop.git
+cd signal-desktop
+snapcraft
+sudo snap install --dangerous signal-desktop_*.snap
+```
+
+Notes: 
+1. Agree to install `multipass` if asked to
+2. `snap install --dangerous` is used as your snap package you just built locally won't have any pre-acknowledged signature for it
 
 ## License
 
