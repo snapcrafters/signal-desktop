@@ -113,6 +113,7 @@ apps:
       - unity7
       - desktop
       - desktop-legacy
+      - screen-inhibit-control
     environment:
       GTK_USE_PORTAL: "1"
       TMPDIR: $XDG_RUNTIME_DIR
