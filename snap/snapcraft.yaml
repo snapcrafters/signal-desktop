@@ -47,11 +47,38 @@ parts:
       VERSION=$(jq . releases.json | grep tag_name | grep -v beta | head -n 1 | cut -d'"' -f4 | tr -d 'v')
       DEB_URL="https://updates.signal.org/desktop/apt/pool/main/s/signal-desktop/signal-desktop_"$VERSION"_amd64.deb"
       wget --quiet $DEB_URL -O signal.deb
-      dpkg-deb -x signal.deb $SNAPCRAFT_PART_INSTALL/
+      dpkg-deb -x signal.deb $CRAFT_PART_INSTALL/
       rm signal.deb releases.json
-      sed -i 's|Icon=signal-desktop|Icon=${SNAP}/usr/share/icons/hicolor/512x512/apps/signal-desktop.png|' $SNAPCRAFT_PART_INSTALL/usr/share/applications/signal-desktop.desktop
-      snapcraftctl set-version "$VERSION"
+      sed -i 's|Icon=signal-desktop|Icon=${SNAP}/usr/share/icons/hicolor/512x512/apps/signal-desktop.png|' $CRAFT_PART_INSTALL/usr/share/applications/signal-desktop.desktop
+      craftctl set version=$VERSION
     prime:
+      - opt
+      - usr/share
+      - usr/lib/*/libxss*
+      - usr/lib/*/*nss*
+      - usr/lib/*/libvips*
+      - usr/lib/*/libI*
+      - usr/lib/*/libMagic*
+      - usr/lib/*/libcfit*
+      - usr/lib/*/libcgif*
+      - usr/lib/*/libexif*
+      - usr/lib/*/libfftw*
+      - usr/lib/*/libgsf*
+      - usr/lib/*/libheif*
+      - usr/lib/*/libimage*
+      - usr/lib/*/libmat*
+      - usr/lib/*/libopensli*
+      - usr/lib/*/libwebp*
+      - usr/lib/*/libHalf*
+      - usr/lib/*/libaom*
+      - usr/lib/*/libdav1d*
+      - usr/lib/*/libx265*
+      - usr/lib/*/libhdf*
+      - usr/lib/*/libsz*
+      - usr/lib/*/liblqr*
+      - usr/lib/*/libaec*
+      - usr/lib/*/libde265*
+      - usr/lib/*/libnuma*
       - -opt/Signal/chrome-sandbox
       - -opt/Signal/resources/app.asar.unpacked/node_modules/sharp/vendor/lib
       - -opt/Signal/resources/app.asar.unpacked/node_modules/sharp/vendor/include
@@ -65,9 +92,9 @@ parts:
       cd /snap/gnome-42-2204/current
       find . -type f,l -exec rm -f $CRAFT_PRIME/{} \;
       for CRUFT in bug lintian man; do
-        rm -rf $SNAPCRAFT_PRIME/usr/share/$CRUFT
+        rm -rf $CRAFT_PRIME/usr/share/$CRUFT
       done
-      find $SNAPCRAFT_PRIME/usr/share/doc/ -type f -not -name 'copyright' -delete
+      find $CRAFT_PRIME/usr/share/doc/ -type f -not -name 'copyright' -delete
 
 apps:
   signal-desktop:
