@@ -33,6 +33,7 @@ parts:
       - gcc
       - dpkg
       - git
+      - wget
     stage-packages:
       - libxss1
       - libnspr4
