@@ -20,7 +20,7 @@ jobs:
             curl -sL https://api.github.com/repos/signalapp/Signal-Desktop/releases | 
             jq .  | grep tag_name | grep -v beta | head -n 1 | cut -d'"' -f4 | tr -d 'v'
           )
-          sed 's/^\(version: \).*$/\1'"$VERSION"'/' snap/snapcraft.yaml
+          sed -i 's/^\(version: \).*$/\1'"$VERSION"'/' snap/snapcraft.yaml
       - name: Check for modified files
         id: git-check
         run: echo ::set-output name=modified::$([ -z "`git status --porcelain`" ] && echo "false" || echo "true")
