@@ -31,9 +31,9 @@ parts:
     plugin: nil
     build-packages:
       - gcc
+      - wget
       - dpkg
       - git
-      - wget
     stage-packages:
       - libxss1
       - libnspr4
@@ -46,7 +46,7 @@ parts:
       DEB_URL="https://updates.signal.org/desktop/apt/pool/main/s/signal-desktop/signal-desktop_"$VERSION"_amd64.deb"
       wget --quiet $DEB_URL -O signal.deb
       dpkg-deb -x signal.deb $CRAFT_PART_INSTALL/
-      rm signal.deb releases.json
+      rm signal.deb
       sed -i 's|Icon=signal-desktop|Icon=${SNAP}/usr/share/icons/hicolor/512x512/apps/signal-desktop.png|' $CRAFT_PART_INSTALL/usr/share/applications/signal-desktop.desktop
       craftctl set version=$VERSION
     prime:
