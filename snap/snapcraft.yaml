@@ -28,27 +28,17 @@ compression: lzo
 
 parts:
   signal-desktop:
-    plugin: nil
-    build-packages:
-      - gcc
-      - wget
-      - dpkg
-      - git
+    plugin: dump
+    source: https://updates.signal.org/desktop/apt/pool/main/s/signal-desktop/signal-desktop_$SNAPCRAFT_PROJECT_VERSION_amd64.deb
     stage-packages:
       - libxss1
       - libnspr4
       - libnss3
       - libvips42
     override-build: |
-      set -xeu
-      echo "Get GitHub releases..."
-      VERSION=$(craftctl get version)
-      DEB_URL="https://updates.signal.org/desktop/apt/pool/main/s/signal-desktop/signal-desktop_"$VERSION"_amd64.deb"
-      wget --quiet $DEB_URL -O signal.deb
-      dpkg-deb -x signal.deb $CRAFT_PART_INSTALL/
-      rm signal.deb
-      sed -i 's|Icon=signal-desktop|Icon=${SNAP}/usr/share/icons/hicolor/512x512/apps/signal-desktop.png|' $CRAFT_PART_INSTALL/usr/share/applications/signal-desktop.desktop
-      craftctl set version=$VERSION
+        set -xeu
+        craftctl default
+        sed -i 's|Icon=signal-desktop|Icon=${SNAP}/usr/share/icons/hicolor/512x512/apps/signal-desktop.png|' $CRAFT_PART_INSTALL/usr/share/applications/signal-desktop.desktop
     prime:
       - opt
       - usr/share
