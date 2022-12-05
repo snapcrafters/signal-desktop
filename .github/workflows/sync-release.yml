@@ -1,0 +1,35 @@
+name: Sync with upstream
+
+on:
+  # Runs at 10:00 UTC every day
+  schedule:
+    - cron:  '0 10 * * *'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  get-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.REPO_SCOPED_TOKEN }}
+      - name: Fetch release version
+        run: |
+          VERSION=$(
+            curl -sL https://api.github.com/repos/signalapp/Signal-Desktop/releases | 
+            jq .  | grep tag_name | grep -v beta | head -n 1 | cut -d'"' -f4 | tr -d 'v'
+          )
+          sed -i 's/^\(version: \).*$/\1'"$VERSION"'/' snap/snapcraft.yaml
+      - name: Check for modified files
+        id: git-check
+        run: |
+          MODIFIED=$([ -z "`git status --porcelain`" ] && echo "false" || echo "true")
+          echo "modified=$MODIFIED" >> $GITHUB_OUTPUT
+      - name: Commit latest release version
+        if: steps.git-check.outputs.modified == 'true'
+        run: |
+          git config --global user.name 'Sync Workflow'
+          git config --global user.email 'merlijn.sebrechts@gmail.com'
+          git commit -am "Automatic sync to latest release"
+          git push

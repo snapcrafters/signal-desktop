@@ -16,6 +16,7 @@ description: |
 license: AGPL-3.0-only
 adopt-info: signal-desktop
 icon: snap/gui/signal-desktop.png
+version: 6.0.0
 
 base: core22
 grade: stable
@@ -27,30 +28,13 @@ compression: lzo
 
 parts:
   signal-desktop:
-    plugin: nil
-    build-packages:
-      - gcc
-      - wget
-      - jq
-      - dpkg
-      - git
+    plugin: dump
+    source: https://updates.signal.org/desktop/apt/pool/main/s/signal-desktop/signal-desktop_$SNAPCRAFT_PROJECT_VERSION_amd64.deb
     stage-packages:
       - libxss1
       - libnspr4
       - libnss3
       - libvips42
-    override-build: |
-      set -xeu
-      echo "Get GitHub releases..."
-      wget --quiet https://api.github.com/repos/signalapp/Signal-Desktop/releases -O releases.json
-      # Get the version from the tag_name and the download URL.
-      VERSION=$(jq . releases.json | grep tag_name | grep -v beta | head -n 1 | cut -d'"' -f4 | tr -d 'v')
-      DEB_URL="https://updates.signal.org/desktop/apt/pool/main/s/signal-desktop/signal-desktop_"$VERSION"_amd64.deb"
-      wget --quiet $DEB_URL -O signal.deb
-      dpkg-deb -x signal.deb $CRAFT_PART_INSTALL/
-      rm signal.deb releases.json
-      sed -i 's|Icon=signal-desktop|Icon=${SNAP}/usr/share/icons/hicolor/512x512/apps/signal-desktop.png|' $CRAFT_PART_INSTALL/usr/share/applications/signal-desktop.desktop
-      craftctl set version=$VERSION
     prime:
       - opt
       - usr/share

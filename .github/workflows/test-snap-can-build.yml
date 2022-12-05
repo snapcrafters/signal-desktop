@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04  # https://github.com/snapcore/action-build/issues/42
 
     steps:
       - uses: actions/checkout@v3
