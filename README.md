@@ -80,5 +80,4 @@ Now that your git metadata has been updated you are ready to create a bugfix bra
 
 ## License
 
-* The license of the build files in this repository is GNU Affero General Public License v3.0 only
-* Signal Desktop itself has [its own license](https://github.com/signalapp/Signal-Desktop/blob/main/LICENSE).
+* The license of both the build files in this repository and Signal Desktop itself is [GNU Affero General Public License v3.0 only](https://github.com/signalapp/Signal-Desktop/blob/main/LICENSE)
