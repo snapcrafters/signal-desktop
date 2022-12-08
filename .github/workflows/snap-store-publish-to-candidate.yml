@@ -12,7 +12,7 @@ on:
 
 env:
   SNAP_NAME: ${{ github.event.repository.name }}
-  CHANNEL: ${{ github.event.repository.name }}
+  CHANNEL: candidate
 
 jobs:
   build:
