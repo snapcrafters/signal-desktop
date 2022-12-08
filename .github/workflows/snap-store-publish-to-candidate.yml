@@ -21,12 +21,12 @@ jobs:
     - uses: actions/checkout@v2
     - uses: snapcore/action-build@v1
       id: build
-    - uses: snapcore/action-publish@v1
-      env:
-        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
-      with:
-        snap: ${{ steps.build.outputs.snap }}
-        release: {{ env.CHANNEL }}
+    # - uses: snapcore/action-publish@v1
+    #   env:
+    #     SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+    #   with:
+    #     snap: ${{ steps.build.outputs.snap }}
+    #     release: {{ env.CHANNEL }}
     - uses: JasonEtco/create-an-issue@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
