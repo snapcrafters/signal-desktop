@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ secrets.REPO_SCOPED_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Fetch release version
         run: |
           VERSION=$(
