@@ -8,7 +8,11 @@ permissions:
 jobs:
   promote:
     runs-on: ubuntu-latest
-    # if: ${{ github.event.issue.pull_request }}
+    if: |
+      ( !github.event.issue.pull_request )
+      && contains(fromJson('["OWNER", "COLLABORATOR"]'), github.event.comment.author_association)
+      && contains(github.event.comment.body, '/promote ')
+      && contains(github.event.*.labels.*.name, 'testing')
     steps:
       - id: command
         uses: xt0rted/slash-command-action@v1
