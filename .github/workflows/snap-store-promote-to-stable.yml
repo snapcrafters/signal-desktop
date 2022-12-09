@@ -43,6 +43,11 @@ jobs:
             exit 1
           fi 
 
+          # Install Snapcraft
+          sudo apt-update -q
+          sudo apt-get install -qy snapd
+          sudo snap install --classic snapcraft
+          sudo chown root:root /
 
           # Snapcraft login
           tmpdir=$(mktemp -d)
