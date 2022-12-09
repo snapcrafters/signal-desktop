@@ -44,13 +44,8 @@ jobs:
           fi 
 
           # Install Snapcraft
-          sudo apt-get update -q
-          sudo apt-get install -qy snapd
           sudo snap install --classic snapcraft
           sudo chown root:root /
-
-          # Snapcraft login
-          snapcraft login
 
           # # Release
           # snapcraft release "$revision" "$channel"
