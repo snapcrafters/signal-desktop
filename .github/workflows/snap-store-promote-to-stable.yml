@@ -32,6 +32,8 @@ jobs:
           revision=${arguments[0]}
           channel=${arguments[1]}
           
+          echo "revision is '$revision', channel is '$channel'"
+
           # Sanity checks
           if [[ ! "$revision" =~ '^[0-9]+$'  ]]; then
             echo "revision must be a number!"
