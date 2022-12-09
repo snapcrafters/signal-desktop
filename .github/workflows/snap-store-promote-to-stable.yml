@@ -5,6 +5,8 @@ on:
 name: Promote to stable
 permissions:
   issues: write
+environment:
+  SNAP_NAME: ${{ github.event.repository.name }}
 jobs:
   promote:
     runs-on: ubuntu-latest
@@ -48,7 +50,7 @@ jobs:
           sudo chown root:root /
 
           # Release
-          snapcraft release "$revision" "$channel"
+          snapcraft release $SNAP_NAME "$revision" "$channel"
 
           echo "revision=$revision" >> $GITHUB_OUTPUT
           echo "channel=$channel" >> $GITHUB_OUTPUT
