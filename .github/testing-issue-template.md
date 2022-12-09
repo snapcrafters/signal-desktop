@@ -10,4 +10,4 @@ You can upgrade to this version by running
 snap refresh {{ env.SNAP_NAME }} --{{ env.CHANNEL }}
 ```
 
-Maintainers can promote this to stable by commenting `/promote <revision-number>`.
+Maintainers can promote this to stable by commenting `/promote <revision-number> stable`.

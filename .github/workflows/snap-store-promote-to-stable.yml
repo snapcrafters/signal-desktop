@@ -1,0 +1,42 @@
+on: issue_comment
+name: Promote to stable
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - id: command
+        uses: xt0rted/slash-command-action@v1
+        with:
+          command: promote
+          reaction: "true"
+          reaction-type: "eyes"
+          allow-edits: "false"
+          permission-level: admin
+      - id: promote
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN_PROMOTE }}
+        run: |
+          echo "The command was '${{ steps.command.outputs.command-name }}' with arguments '${{ steps.command.outputs.command-arguments }}'"
+          arguments=(${{ steps.command.outputs.command-arguments }})
+          revision=${arguments[0]}
+          channel=${arguments[1]}
+          
+          # Sanity checks
+          if [[ ! "$channel" =~ '^[0-9]+$'  ]]; then
+            echo "revision must be a number!"
+            exit 1
+          fi
+          if [[ "$channel" != "stable"  ]]; then
+            echo "I can only promote to stable!"
+            exit 1
+          fi 
+
+
+          # Snapcraft login
+          tmpdir=$(mktemp -d)
+          echo "${{ env.SNAPCRAFT_STORE_CREDENTIALS }}" > "$tmpdir/login.txt"
+          snapcraft login --with "$tmpdir/login.txt"
+
+          # Release
+          snapcraft release "$revision" "$channel"
