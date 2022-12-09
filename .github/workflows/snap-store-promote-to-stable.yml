@@ -32,15 +32,14 @@ jobs:
           revision=${arguments[0]}
           channel=${arguments[1]}
           
-          echo "revision is '$revision', channel is '$channel'"
-
           # Sanity checks
-          if [[ ! "$revision" =~ '^[0-9]+$'  ]]; then
-            echo "revision must be a number!"
+          re='^[0-9]+$'
+          if [[ ! "$revision" =~ $re ]]; then
+            echo "revision must be a number, not '$revision'!"
             exit 1
           fi
           if [[ "$channel" != "stable"  ]]; then
-            echo "I can only promote to stable!"
+            echo "I can only promote to stable, not '$channel'!"
             exit 1
           fi 
 
