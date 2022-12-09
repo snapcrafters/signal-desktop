@@ -47,8 +47,8 @@ jobs:
           sudo snap install --classic snapcraft
           sudo chown root:root /
 
-          # # Release
-          # snapcraft release "$revision" "$channel"
+          # Release
+          snapcraft release "$revision" "$channel"
 
           echo "revision=$revision" >> $GITHUB_OUTPUT
           echo "channel=$channel" >> $GITHUB_OUTPUT
