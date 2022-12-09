@@ -8,8 +8,10 @@ on:
   workflow_dispatch:
 
 env:
+  # Use the name of the repo as the name of the snap
   SNAP_NAME: ${{ github.event.repository.name }}
-  CHANNEL: candidate
+  # Use the name of the branch as the name of the channel
+  CHANNEL: ${{ github.ref_name }}
 
 jobs:
   build:
@@ -29,17 +31,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           filename: .github/testing-issue-template.md
-
-      - name: Dump GitHub context
-        id: github_context_step
-        run: echo '${{ toJSON(github) }}'
-      - name: Dump job context
-        run: echo '${{ toJSON(job) }}'
-      - name: Dump steps context
-        run: echo '${{ toJSON(steps) }}'
-      - name: Dump runner context
-        run: echo '${{ toJSON(runner) }}'
-      - name: Dump strategy context
-        run: echo '${{ toJSON(strategy) }}'
-      - name: Dump matrix context
-        run: echo '${{ toJSON(matrix) }}'
