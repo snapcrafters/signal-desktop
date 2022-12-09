@@ -3,7 +3,8 @@ on:
     types:
       - created    
 name: Promote to stable
-
+permissions:
+  issues: write
 jobs:
   promote:
     runs-on: ubuntu-latest
@@ -12,6 +13,7 @@ jobs:
       - id: command
         uses: xt0rted/slash-command-action@v1
         with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           command: promote
           reaction: "true"
           reaction-type: "eyes"
