@@ -33,7 +33,7 @@ jobs:
           channel=${arguments[1]}
           
           # Sanity checks
-          if [[ ! "$channel" =~ '^[0-9]+$'  ]]; then
+          if [[ ! "$revision" =~ '^[0-9]+$'  ]]; then
             echo "revision must be a number!"
             exit 1
           fi
