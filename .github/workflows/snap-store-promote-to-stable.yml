@@ -50,9 +50,7 @@ jobs:
           sudo chown root:root /
 
           # Snapcraft login
-          tmpdir=$(mktemp -d)
-          echo "${{ env.SNAPCRAFT_STORE_CREDENTIALS }}" > "$tmpdir/login.txt"
-          snapcraft login --with "$tmpdir/login.txt"
+          snapcraft login
 
           # # Release
           # snapcraft release "$revision" "$channel"
