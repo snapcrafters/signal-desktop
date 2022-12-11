@@ -1,12 +1,16 @@
+name: 📦 Promote to stable
+
 on:
   issue_comment:
     types:
-      - created    
-name: Promote to stable
+      - created
+
 permissions:
   issues: write
+
 env:
   SNAP_NAME: ${{ github.event.repository.name }}
+
 jobs:
   promote:
     runs-on: ubuntu-latest

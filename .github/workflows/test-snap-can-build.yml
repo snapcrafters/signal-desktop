@@ -4,6 +4,10 @@ on:
   pull_request:
     branches: [ "**" ]
 
+# Permissions for GITHUB_TOKEN
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
