@@ -1,0 +1,75 @@
+name: 📦 Promote to stable
+
+on:
+  issue_comment:
+    types:
+      - created
+
+permissions:
+  issues: write
+
+env:
+  SNAP_NAME: ${{ github.event.repository.name }}
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    if: |
+      ( !github.event.issue.pull_request )
+      && contains(fromJson('["OWNER", "COLLABORATOR"]'), github.event.comment.author_association)
+      && contains(github.event.comment.body, '/promote ')
+      && contains(github.event.*.labels.*.name, 'testing')
+    steps:
+      - id: command
+        uses: xt0rted/slash-command-action@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          command: promote
+          reaction: "true"
+          reaction-type: "eyes"
+          allow-edits: "false"
+          permission-level: admin
+      - id: promote
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN_PROMOTE }}
+        run: |
+          echo "The command was '${{ steps.command.outputs.command-name }}' with arguments '${{ steps.command.outputs.command-arguments }}'"
+          arguments=(${{ steps.command.outputs.command-arguments }})
+          revision=${arguments[0]}
+          channel=${arguments[1]}
+          
+          # Sanity checks
+          re='^[0-9]+$'
+          if [[ ! "$revision" =~ $re ]]; then
+            echo "revision must be a number, not '$revision'!"
+            exit 1
+          fi
+          if [[ "$channel" != "stable"  ]]; then
+            echo "I can only promote to stable, not '$channel'!"
+            exit 1
+          fi 
+
+          # Install Snapcraft
+          sudo snap install --classic snapcraft
+          sudo chown root:root /
+
+          # Release
+          snapcraft release $SNAP_NAME "$revision" "$channel"
+
+          echo "revision=$revision" >> $GITHUB_OUTPUT
+          echo "channel=$channel" >> $GITHUB_OUTPUT
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Great, revision `${{ steps.promote.outputs.revision }}` version is now in `${{ steps.promote.outputs.channel }}`!'
+            })
+            github.rest.issues.update({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed'
+            })

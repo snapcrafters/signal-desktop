@@ -1,14 +1,16 @@
 name: 🧪 Test snap can be built on x86_64
 
 on:
-  push:
-    branches: [ "master" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "**" ]
+
+# Permissions for GITHUB_TOKEN
+permissions:
+  contents: read
 
 jobs:
   build:
-    runs-on: ubuntu-20.04  # https://github.com/snapcore/action-build/issues/42
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
