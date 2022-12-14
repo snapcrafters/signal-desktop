@@ -1,0 +1,48 @@
+name: 📦 Publish to candidate
+
+on:
+  push:
+    branches: [ "candidate" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Permissions for GITHUB_TOKEN
+permissions:
+  contents: read
+  issues: write
+
+env:
+  # Use the name of the repo as the name of the snap
+  SNAP_NAME: ${{ github.event.repository.name }}
+  # Use the name of the branch as the name of the channel
+  CHANNEL: ${{ github.ref_name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: snapcore/action-build@v1
+        id: build
+      - uses: diddlesnaps/snapcraft-review-action@v1
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          isClassic: 'false'
+      - uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN_PUBLISH }}
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: ${{ env.CHANNEL }}
+          
+  create_issue:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          filename: .github/testing-issue-template.md
