@@ -16,7 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       ( !github.event.issue.pull_request )
-      && contains(fromJson('["OWNER", "COLLABORATOR"]'), github.event.comment.author_association)
       && contains(github.event.comment.body, '/promote ')
       && contains(github.event.*.labels.*.name, 'testing')
     steps:
@@ -73,3 +72,6 @@ jobs:
               repo: context.repo.repo,
               state: 'closed'
             })
+      - name: Dump GitHub context
+        id: github_context_step
+        run: echo '${{ toJSON(github) }}'
