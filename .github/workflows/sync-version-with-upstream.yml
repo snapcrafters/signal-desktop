@@ -33,7 +33,7 @@ jobs:
       - name: Commit latest release version
         if: steps.git-check.outputs.modified == 'true'
         run: |
-          git config --global user.name 'Sync Workflow'
+          git config --global user.name 'github-actions [bot]'
           git config --global user.email 'merlijn.sebrechts@gmail.com'
           git commit -am "Automatic sync to latest release"
           git push
