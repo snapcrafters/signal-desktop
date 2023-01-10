@@ -20,6 +20,7 @@ env:
 
 jobs:
   build:
+    environment: "Candidate Branch"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -31,7 +32,7 @@ jobs:
           isClassic: 'false'
       - uses: snapcore/action-publish@v1
         env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN_PUBLISH }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_CANDIDATE }}
         with:
           snap: ${{ steps.build.outputs.snap }}
           release: ${{ env.CHANNEL }}
