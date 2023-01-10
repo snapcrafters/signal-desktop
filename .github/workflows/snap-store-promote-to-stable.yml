@@ -13,6 +13,7 @@ env:
 
 jobs:
   promote:
+    environment: "Candidate Branch"
     runs-on: ubuntu-latest
     if: |
       ( !github.event.issue.pull_request )
@@ -30,7 +31,7 @@ jobs:
           permission-level: admin
       - id: promote
         env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN_PROMOTE }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_STABLE }}
         run: |
           echo "The command was '${{ steps.command.outputs.command-name }}' with arguments '${{ steps.command.outputs.command-arguments }}'"
           arguments=(${{ steps.command.outputs.command-arguments }})
