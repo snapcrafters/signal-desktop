@@ -73,6 +73,3 @@ jobs:
               repo: context.repo.repo,
               state: 'closed'
             })
-      - name: Dump GitHub context
-        id: github_context_step
-        run: echo '${{ toJSON(github) }}'
