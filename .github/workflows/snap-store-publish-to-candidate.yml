@@ -8,6 +8,9 @@ on:
   workflow_dispatch:
   # Allow the workflow to be started by another workflow.
   workflow_call:
+    secrets:
+      SNAP_STORE_CANDIDATE:
+        required: true
 
 # Permissions for GITHUB_TOKEN
 permissions:
