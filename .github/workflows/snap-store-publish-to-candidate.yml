@@ -1,11 +1,13 @@
 name: 📦 Publish to candidate
 
 on:
+  # Run the workflow each time new commits are pushed to the candidate branch. 
   push:
     branches: [ "candidate" ]
-
-  # Allows you to run this workflow manually from the Actions tab
+  # Allow the workflow to be started manually from the Actions tab.
   workflow_dispatch:
+  # Allow the workflow to be started by another workflow.
+  workflow_call:
 
 # Permissions for GITHUB_TOKEN
 permissions:
