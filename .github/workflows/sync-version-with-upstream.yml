@@ -9,7 +9,7 @@ on:
 
 
 jobs:
-  get-version:
+  sync-version:
     environment: "Candidate Branch"
     runs-on: ubuntu-latest
     steps:
@@ -35,3 +35,6 @@ jobs:
           git config --global user.email 'merlijn.sebrechts+snapcrafters-bot@gmail.com'
           git commit -am "Automatic sync to latest release"
           git push
+  call-workflow-1-in-local-repo:
+    needs: sync-version
+    uses: ./.github/workflows/snap-store-publish-to-candidate.yml
