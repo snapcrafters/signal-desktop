@@ -35,6 +35,10 @@ jobs:
           git config --global user.email 'merlijn.sebrechts+snapcrafters-bot@gmail.com'
           git commit -am "Automatic sync to latest release"
           git push
-  call-snap-store-publish-to-candidate:
+  call-snap-store-publish-to-candidate: 
+    # Permissions needed by the called workflow
+    permissions:
+      contents: read
+      issues: write
     needs: sync-version
     uses: ./.github/workflows/snap-store-publish-to-candidate.yml
