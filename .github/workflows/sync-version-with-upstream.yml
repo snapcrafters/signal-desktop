@@ -10,6 +10,7 @@ on:
 
 jobs:
   sync-version:
+    name: "Synchronize app version with upstream"
     environment: "Candidate Branch"
     runs-on: ubuntu-latest
     steps:
@@ -35,12 +36,15 @@ jobs:
           git config --global user.email 'merlijn.sebrechts+snapcrafters-bot@gmail.com'
           git commit -am "Automatic sync to latest release"
           git push
+    outputs:
+      modified: ${{ steps.git-check.outputs.modified }}
   call-snap-store-publish-to-candidate: 
+    needs: sync-version
+    if: needs.sync-version.outputs.modified == 'true'
     # Permissions needed by the called workflow
     permissions:
       contents: read
       issues: write
-    needs: sync-version
-    uses: ./.github/workflows/snap-store-publish-to-candidate.yml
     secrets:
       SNAP_STORE_CANDIDATE: ${{ secrets.SNAP_STORE_CANDIDATE }}
+    uses: ./.github/workflows/snap-store-publish-to-candidate.yml
