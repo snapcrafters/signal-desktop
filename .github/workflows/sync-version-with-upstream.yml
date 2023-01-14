@@ -10,7 +10,7 @@ on:
 
 jobs:
   sync-version:
-    name: "Synchronize app version with upstream"
+    name: "Update snapcraft.yaml"
     environment: "Candidate Branch"
     runs-on: ubuntu-latest
     steps:
