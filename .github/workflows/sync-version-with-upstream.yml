@@ -38,7 +38,8 @@ jobs:
           git push
     outputs:
       modified: ${{ steps.git-check.outputs.modified }}
-  call-snap-store-publish-to-candidate: 
+  call-snap-store-publish-to-candidate:
+    name: "Call"
     needs: sync-version
     if: needs.sync-version.outputs.modified == 'true'
     # Permissions needed by the called workflow
