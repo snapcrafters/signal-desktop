@@ -20,8 +20,8 @@ permissions:
 env:
   # Use the name of the repo as the name of the snap
   SNAP_NAME: ${{ github.event.repository.name }}
-  # Use the name of the branch as the name of the channel
-  CHANNEL: ${{ github.ref_name }}
+  # Hardcoded git branch and Snap Store channel channel
+  CHANNEL: 'candidate'
 
 jobs:
   build:
@@ -30,6 +30,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ env.CHANNEL }}
       - uses: snapcore/action-build@v1
         id: build
       - uses: diddlesnaps/snapcraft-review-action@v1
