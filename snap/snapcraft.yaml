@@ -1,10 +1,17 @@
 name: signal-desktop
 title: Signal Desktop
-summary: Private messaging from your desktop.
+summary: Speak Freely - Private Messenger
 description: |
-  Private messaging from your desktop.
-  
-  To use the Signal desktop app, Signal must first be installed on your phone.
+  **Note: To use the Signal desktop app, you must first install Signal on your phone.**
+
+  Millions of people use Signal every day for free and instantaneous communication anywhere in the world. Send and receive high-fidelity messages, participate in HD voice/video calls, and explore a growing set of new features that help you stay connected. Signal's advanced privacy-preserving technology is always enabled, so you can focus on sharing the moments that matter with the people who matter to you.
+
+  - Say anything - State-of-the-art end-to-end encryption (powered by the open source Signal Protocol™) keeps your conversations secure. Privacy isn't an optional mode; it's just the way that Signal works. Every message, every call, every time.
+  - Go fast - Messages are delivered quickly and reliably, even on slow networks. Signal is optimized to operate in the most constrained environment possible.
+  - Feel free - Signal is a completely independent 501c3 nonprofit. Development is supported by users like you. No advertisements. No trackers. No kidding.
+  - Be yourself - You can use your existing phone number and address book to securely communicate with your friends.
+  - Speak up - Whether they live across town or across the ocean, Signal's enhanced audio and video quality will make your friends and family feel closer.
+  - Whisper in the shadows - Switch to the dark theme if you refuse to see the light.
 
   **Are you having issues?**
 
@@ -13,6 +20,10 @@ description: |
   **Authors**
 
   This snap is maintained by the Snapcrafters community, and is not necessarily endorsed or officially maintained by the upstream developers.
+website: https://signal.org/
+contact: https://github.com//snapcrafters/signal-desktop/issues
+issues: https://github.com//snapcrafters/signal-desktop/issues
+source-code: https://github.com//snapcrafters/signal-desktop
 license: AGPL-3.0-only
 adopt-info: signal-desktop
 icon: snap/gui/signal-desktop.png
