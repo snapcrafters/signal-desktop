@@ -40,7 +40,7 @@ compression: lzo
 parts:
   signal-desktop:
     plugin: dump
-    source: https://updates.signal.org/desktop/apt/pool/main/s/signal-desktop/signal-desktop_$SNAPCRAFT_PROJECT_VERSION_amd64.deb
+    source: https://updates.signal.org/desktop/apt/pool/s/signal-desktop/signal-desktop_$SNAPCRAFT_PROJECT_VERSION_amd64.deb
     stage-packages:
       - libxss1
       - libnspr4
