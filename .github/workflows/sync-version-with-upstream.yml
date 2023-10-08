@@ -38,14 +38,3 @@ jobs:
           git push
     outputs:
       modified: ${{ steps.git-check.outputs.modified }}
-  call-snap-store-publish-to-candidate:
-    name: "Call"
-    needs: sync-version
-    if: needs.sync-version.outputs.modified == 'true'
-    # Permissions needed by the called workflow
-    permissions:
-      contents: read
-      issues: write
-    secrets:
-      SNAP_STORE_CANDIDATE: ${{ secrets.SNAP_STORE_CANDIDATE }}
-    uses: ./.github/workflows/snap-store-publish-to-candidate.yml
