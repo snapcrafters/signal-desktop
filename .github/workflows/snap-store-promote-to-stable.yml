@@ -28,7 +28,7 @@ jobs:
           reaction: "true"
           reaction-type: "eyes"
           allow-edits: "false"
-          permission-level: admin
+          permission-level: write
       - id: promote
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_STABLE }}
