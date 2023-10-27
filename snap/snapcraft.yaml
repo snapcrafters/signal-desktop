@@ -35,12 +35,117 @@ confinement: strict
 
 architectures:
   - build-on: amd64
+  - build-on: arm64
 compression: lzo
 
 parts:
   signal-desktop:
     plugin: dump
-    source: https://updates.signal.org/desktop/apt/pool/s/signal-desktop/signal-desktop_$SNAPCRAFT_PROJECT_VERSION_amd64.deb
+    source: https://github.com/signalapp/Signal-Desktop
+    source-type: git
+    source-tag: v$SNAPCRAFT_PROJECT_VERSION
+    build-packages:
+      - git-lfs
+      - jq
+      - moreutils
+      - python3
+      - wget
+    build-environment:
+      - SIGNAL_ENV: "production"
+      - USE_SYSTEM_FPM: "true"
+    override-build: |
+      # Set a common proxy variable, defaulting to empty if not set
+      export HTTP_PROXY="${http_proxy:-}"
+      export HTTPS_PROXY="${https_proxy:-}"
+
+      # Ensure that electron-builder respects the proxy
+      export ELECTRON_GET_USE_PROXY=1
+      export GLOBAL_AGENT_HTTP_PROXY="${HTTP_PROXY}"
+      export GLOBAL_AGENT_HTTPS_PROXY="${HTTP_PROXY}"
+
+      git lfs install
+      
+      # Disable yarn auto clean functionality
+      rm .yarnclean
+
+      # Install the version of NodeJS used by the upstream project
+      git clone -b v0.13.1 https://github.com/asdf-vm/asdf.git ./.asdf
+      source "./.asdf/asdf.sh"
+      asdf plugin add nodejs
+      asdf install nodejs 18.15.0
+      asdf global nodejs 18.15.0
+
+      # Install and configure Yarn
+      npm install -g yarn 
+      yarn config set python /usr/bin/python3
+      yarn config set proxy "$HTTP_PROXY"
+      yarn config set https-proxy "$HTTPS_PROXY"
+
+      # Don't try to build a deb (this fails on arm64)
+      cat package.json | jq '.build.linux.target = ["dir"]' | sponge package.json
+
+      # If we're in a proxy environment, we need to patch some packages
+      if [[ -n "$HTTPS_PROXY" ]]; then
+        yarn global add https-proxy-agent
+        
+        # Two lines of NodeJS code that initialise a proxy-agent-instance
+        export PROXY_PATCH="const { HttpsProxyAgent } = require('https-proxy-agent');\nconst agent = new HttpsProxyAgent('${HTTPS_PROXY}');\n"
+
+        # Vendor and patch the @signalapp/ringrtc package so it's build fetch uses a proxy
+        mkdir -p vendor/ringrtc
+        version="$(cat package.json| jq -r '.dependencies."@signalapp/ringrtc"')"
+        pushd vendor/ringrtc
+        npm pack "@signalapp/ringrtc@${version}"
+        tar xvzf "signalapp-ringrtc-${version}.tgz"
+        echo -e "${PROXY_PATCH}$(cat package/scripts/fetch-prebuild.js)" > package/scripts/fetch-prebuild.js
+        sed -i 's|https.get(URL, async res|https.get(URL, { agent }, async res|g' package/scripts/fetch-prebuild.js
+        popd
+
+        # Update the package.json so the build uses the patched library
+        cat package.json \
+          | jq -r '.dependencies."@signalapp/ringrtc"="file:./vendor/ringrtc/package"' \
+          | sponge package.json
+
+        # Vendor and patch the @signalapp/better-sqlite3 package so it's build fetch uses a proxy
+        mkdir -p vendor/better-sqlite3
+        version="$(cat package.json| jq -r '.dependencies."@signalapp/better-sqlite3"')"
+        pushd vendor/better-sqlite3
+        npm pack "@signalapp/better-sqlite3@${version}"
+        tar xvzf "signalapp-better-sqlite3-${version}.tgz"
+        echo -e "${PROXY_PATCH}$(cat package/deps/download.js)" > package/deps/download.js
+        sed -i 's|https.get(URL, async (res)|https.get(URL, { agent }, async (res)|g' package/deps/download.js
+        popd
+
+        # Update the package.json so the build uses the patched library
+        cat package.json \
+          | jq -r '.dependencies."@signalapp/better-sqlite3"="file:./vendor/better-sqlite3/package"' \
+          | sponge package.json
+      fi
+
+      # Install the dependencies for the Signal-Desktop application.
+      # We cannot use `--frozen-lockfile` due to the modifications above
+      yarn install
+
+      # This is the equivalent of 'yarn generate'. The upstream package.json
+      # uses npm-run-all to run multiple things, which has a bug that prevents
+      # this from succeeding in the snapcraft build env, so this just breaks
+      # that apart into its component parts.
+      yarn build-protobuf
+      yarn build:esbuild
+      yarn sass 
+      yarn get-expire-time
+      yarn copy-components
+
+      # This is the equivalent of 'yarn build-linux' which also runs 'yarn generate'
+      # which is broken (as described above).
+      yarn build:esbuild:prod
+      yarn build:release --publish=never
+      yarn build:electron --config.directories.output=release
+
+      # Stage the built release. Directory is called 'linux-unpacked' for amd64,
+      # and 'linux-arm64-unpacked' for arm64.
+      mkdir -p "${CRAFT_PART_INSTALL}/opt"
+      mv release/linux-*unpacked "${CRAFT_PART_INSTALL}/opt/Signal"
     stage-packages:
       - libxss1
       - libnspr4
@@ -94,7 +199,6 @@ parts:
 apps:
   signal-desktop:
     extensions: [gnome]
-    desktop: usr/share/applications/signal-desktop.desktop
     command: opt/Signal/signal-desktop --use-tray-icon --no-sandbox
     plugs:
       - browser-support
