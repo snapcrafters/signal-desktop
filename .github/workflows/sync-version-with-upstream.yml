@@ -24,6 +24,17 @@ jobs:
             jq .  | grep tag_name | grep -v beta | head -n 1 | cut -d'"' -f4 | tr -d 'v'
           )
           sed -i 's/^\(version: \).*$/\1'"$VERSION"'/' snap/snapcraft.yaml
+
+          # Fetch the upstream package.json for the fetched version
+          wget -qO package.json https://raw.githubusercontent.com/signalapp/Signal-Desktop/v${VERSION}/package.json
+
+          # Update the @signalapp/ringrtc version if required
+          export RINGRTC_VERSION="$(cat package.json | jq -r '.dependencies."@signalapp/ringrtc"')"
+          sed -i -E "s|ringrtc-[0-9]+\.[0-9]+\.[0-9]+\.tgz|ringrtc-${RINGRTC_VERSION}.tgz|" snap/snapcraft.yaml
+
+          # Update the @signalapp/bettersqlite version if required
+          BETTERSQLITE_VERSION="$(cat package.json | jq -r '.dependencies."@signalapp/better-sqlite3"')"
+          sed -i -E "s|better-sqlite3-[0-9]+\.[0-9]+\.[0-9]+\.tgz|better-sqlite3-${BETTERSQLITE_VERSION}.tgz|" snap/snapcraft.yaml
       - name: Check for modified files
         id: git-check
         run: |
