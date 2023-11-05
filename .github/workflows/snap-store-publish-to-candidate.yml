@@ -28,17 +28,44 @@ jobs:
     name: "Build and publish snap"
     environment: "Candidate Branch"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: ["amd64", "arm64"]
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout the source
+        uses: actions/checkout@v3
         with:
           ref: ${{ env.CHANNEL }}
-      - uses: snapcore/action-build@v1
+
+      - name: Setup snapcraft
+        env:
+          LP_BUILD_SECRET: ${{ secrets.LP_BUILD_SECRET }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_CANDIDATE }}
+        run: |
+          sudo snap install snapcraft --classic
+          
+          # Setup Launchpad credentials
+          mkdir -p ~/.local/share/snapcraft/provider/launchpad
+          echo "$LP_BUILD_SECRET" > ~/.local/share/snapcraft/provider/launchpad/credentials
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "Github Actions"
+
+      - name: Remote build the snap
         id: build
-      - uses: diddlesnaps/snapcraft-review-action@v1
+        run : |
+          snapcraft remote-build --launchpad-accept-public-upload --build-for ${{ matrix.arch }}
+          
+          version="$(cat snap/snapcraft.yaml | yq -r '.version')"
+          echo "{snap}={signal_desktop_$version_${{ matrix.arch}}.snap}" >> "$GITHUB_OUTPUT"
+
+      - name: Run the snapcraft review tools
+        uses: diddlesnaps/snapcraft-review-action@v1
         with:
           snap: ${{ steps.build.outputs.snap }}
           isClassic: 'false'
-      - uses: snapcore/action-publish@v1
+      
+      - name: Publish the snap
+        uses: snapcore/action-publish@v1
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_CANDIDATE }}
         with:
