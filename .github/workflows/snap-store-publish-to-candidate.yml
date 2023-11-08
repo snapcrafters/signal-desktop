@@ -11,6 +11,8 @@ on:
     secrets:
       SNAP_STORE_CANDIDATE:
         required: true
+      LP_BUILD_SECRET:
+        required: true
 
 # Permissions for GITHUB_TOKEN
 permissions:
