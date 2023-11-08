@@ -11,12 +11,33 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: ["amd64", "arm64"]
 
     steps:
       - uses: actions/checkout@v3
 
-      - uses: snapcore/action-build@v1
+      - name: Setup snapcraft
+        env:
+          LP_BUILD_SECRET: ${{ secrets.LP_BUILD_SECRET }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_CANDIDATE }}
+        run: |
+          sudo snap install snapcraft --classic
+          
+          # Setup Launchpad credentials
+          mkdir -p ~/.local/share/snapcraft/provider/launchpad
+          echo "$LP_BUILD_SECRET" > ~/.local/share/snapcraft/provider/launchpad/credentials
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "Github Actions"
+
+      - name: Remote build the snap
         id: build
+        run : |
+          snapcraft remote-build --launchpad-accept-public-upload --build-for ${{ matrix.arch }}
+          
+          version="$(cat snap/snapcraft.yaml | yq -r '.version')"
+          echo "{snap}={signal_desktop_$version_${{ matrix.arch}}.snap}" >> "$GITHUB_OUTPUT"
 
       - uses: diddlesnaps/snapcraft-review-action@v1
         with:
