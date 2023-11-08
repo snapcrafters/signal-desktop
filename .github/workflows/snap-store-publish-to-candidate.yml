@@ -57,15 +57,6 @@ jobs:
           
           version="$(cat snap/snapcraft.yaml | yq -r '.version')"
           echo "{snap}={signal_desktop_$version_${{ matrix.arch}}.snap}" >> "$GITHUB_OUTPUT"
-          echo "{log}={signal_desktop_$version_${{ matrix.arch}}.txt}" >> "$GITHUB_OUTPUT"
-
-      - name: Upload remote build snap artifacts and build logs
-        uses: actions/upload-artifact@v3
-        with:
-          name: remote-build-snaps
-          path: |
-            ${{ steps.build.outputs.snap }}
-            ${{ steps.build.outputs.log }}
 
       - name: Run the snapcraft review tools
         uses: diddlesnaps/snapcraft-review-action@v1
