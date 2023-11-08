@@ -38,10 +38,10 @@ jobs:
           revision=${arguments[0]}
           channel=${arguments[1]}
           
-          # Sanity checks
-          re='^[0-9]+$'
+          # Validation checks
+          re='^[0-9]+([,][0-9]+)*$'
           if [[ ! "$revision" =~ $re ]]; then
-            echo "revision must be a number, not '$revision'!"
+            echo "revision must be a number or a comma seperated list of numbers, not '$revision'!"
             exit 1
           fi
           if [[ "$channel" != "stable"  ]]; then
@@ -53,10 +53,16 @@ jobs:
           sudo snap install --classic snapcraft
           sudo chown root:root /
 
-          # Release
-          snapcraft release $SNAP_NAME "$revision" "$channel"
+          # Iterate over each specified revision and release
+          revs=$(echo $revision | tr "," "\n")
+          released_revs=()
+          
+          for r in $revs; do
+            snapcraft release $SNAP_NAME "$r" "$channel"
+            released_revs+="$r"
+          done
 
-          echo "revision=$revision" >> $GITHUB_OUTPUT
+          echo "revisions=${released_revs[@]}" >> $GITHUB_OUTPUT
           echo "channel=$channel" >> $GITHUB_OUTPUT
       - uses: actions/github-script@v6
         with:
@@ -65,7 +71,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Great, revision `${{ steps.promote.outputs.revision }}` version is now in `${{ steps.promote.outputs.channel }}`!'
+              body: 'The following revisions were released to the `${{ steps.promote.outputs.channel }}` channel: `${{ steps.promote.outputs.revisions }}`'
             })
             github.rest.issues.update({
               issue_number: context.issue.number,
