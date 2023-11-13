@@ -77,7 +77,7 @@ jobs:
           ARCHITECTURE: ${{ matrix.architecture }}
         run: |
           rev=$(snapcraft push $SNAP_NAME --release=$CHANNEL)
-          echo "revision_${ARCHITECTURE}=${released_revs[@]}" >> $GITHUB_OUTPUT
+          echo "revision_${ARCHITECTURE}=${rev}" >> $GITHUB_OUTPUT
     outputs: 
       revision_amd64: ${{ steps.publish.outputs.revision_amd64 }}
       revision_arm64: ${{ steps.publish.outputs.revision_arm64 }}
