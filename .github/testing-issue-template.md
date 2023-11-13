@@ -28,11 +28,10 @@ A new version ({{ env.version }}) of `{{ env.SNAP_NAME }}` was just pushed to th
 
 ## How to release it
 
-Maintainers can promote this to stable by commenting `/promote <rev>[,<rev>] stable`.
-
-The issue will only be closed if you promote all revisions
+Maintainers can promote this to stable by commenting `/promote <rev>[,<rev>] stable [done]`.
 
 > For example
 >
 > * To promote a single revision, run `/promote 34 stable`
 > * To promote multiple revisions, run `/promote 34,35 stable`
+> * To promote a revision and close the issue, run `/promote 34,35 stable done`
