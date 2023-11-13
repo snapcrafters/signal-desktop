@@ -34,9 +34,10 @@ grade: stable
 confinement: strict
 compression: lzo
 
-architectures:
-  - build-on: amd64
-  - build-on: arm64
+# Can't use it until this is fixed: https://bugs.launchpad.net/snapcraft/+bug/1885150
+# architectures:
+#   - build-on: amd64
+#   - build-on: arm64
 
 parts:
   # NodeJS dependency which uses a non-proxy aware fetch during its build.

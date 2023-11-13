@@ -30,6 +30,9 @@ jobs:
     name: "Build and publish snap"
     environment: "Candidate Branch"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        architecture: ['amd64', 'arm64']
     steps:
       - name: Checkout the source
         uses: actions/checkout@v3
@@ -51,41 +54,34 @@ jobs:
 
       - name: Remote build the snap
         id: build
+        env:
+          ARCHITECTURE: ${{ matrix.architecture }}
         run : |
-          snapcraft remote-build --launchpad-accept-public-upload
-          
+          snapcraft remote-build --launchpad-accept-public-upload --build-for=${ARCHITECTURE}
+
           version="$(cat snap/snapcraft.yaml | yq -r '.version')"
-          echo "amd64_snap=signal-desktop_${version}_amd64.snap" >> "$GITHUB_OUTPUT"
-          echo "arm64_snap=signal-desktop_${version}_arm64.snap" >> "$GITHUB_OUTPUT"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "snap=signal-desktop_${version}_${ARCHITECTURE}.snap" >> "$GITHUB_OUTPUT"
 
-      - name: Review the built amd64 snap
+      - name: Review the built snap
         uses: diddlesnaps/snapcraft-review-action@v1
         with:
-          snap: ${{ steps.build.outputs.amd64_snap }}
+          snap: ${{ steps.build.outputs.snap }}
           isClassic: 'false'
 
-      - name: Review the built arm64 snap
-        uses: diddlesnaps/snapcraft-review-action@v1
-        with:
-          snap: ${{ steps.build.outputs.arm64_snap }}
-          isClassic: 'false'
-
-      - name: Publish the amd64 snap
-        uses: snapcore/action-publish@v1
+      - name: Publish the built snap
+        id: publish
         env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_CANDIDATE }}
-        with:
-          snap: ${{ steps.build.outputs.amd64_snap }}
-          release: ${{ env.CHANNEL }}
-
-      - name: Publish the arm64 snap
-        uses: snapcore/action-publish@v1
-        env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_CANDIDATE }}
-        with:
-          snap: ${{ steps.build.outputs.arm64_snap }}
-          release: ${{ env.CHANNEL }}
-          
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_STABLE }}
+          SNAP_NAME: ${{ steps.build.outputs.amd64_snap }}
+          ARCHITECTURE: ${{ matrix.architecture }}
+        run: |
+          rev=$(snapcraft push $SNAP_NAME --release=$CHANNEL)
+          echo "revision_${ARCHITECTURE}=${released_revs[@]}" >> $GITHUB_OUTPUT
+    outputs: 
+      revision_amd64: ${{ steps.publish.outputs.revision_amd64 }}
+      revision_arm64: ${{ steps.publish.outputs.revision_arm64 }}
+      version: ${{ steps.build.outputs.version }}
   create_issue:
     name: "Create call for testing"
     needs: build
@@ -95,5 +91,8 @@ jobs:
       - uses: JasonEtco/create-an-issue@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          revision_amd64: ${{ needs.build.outputs.revision_amd64 }}
+          revision_arm64: ${{ needs.build.outputs.revision_arm64 }}
+          version: ${{ needs.build.outputs.version }}
         with:
           filename: .github/testing-issue-template.md
