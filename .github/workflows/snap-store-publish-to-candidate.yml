@@ -11,6 +11,8 @@ on:
     secrets:
       SNAP_STORE_CANDIDATE:
         required: true
+      LP_BUILD_SECRET:
+        required: true
 
 # Permissions for GITHUB_TOKEN
 permissions:
@@ -29,20 +31,59 @@ jobs:
     environment: "Candidate Branch"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout the source
+        uses: actions/checkout@v3
         with:
           ref: ${{ env.CHANNEL }}
-      - uses: snapcore/action-build@v1
+
+      - name: Setup snapcraft
+        env:
+          LP_BUILD_SECRET: ${{ secrets.LP_BUILD_SECRET }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_CANDIDATE }}
+        run: |
+          sudo snap install snapcraft --classic
+          
+          # Setup Launchpad credentials
+          mkdir -p ~/.local/share/snapcraft/provider/launchpad
+          echo "$LP_BUILD_SECRET" > ~/.local/share/snapcraft/provider/launchpad/credentials
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "Github Actions"
+
+      - name: Remote build the snap
         id: build
-      - uses: diddlesnaps/snapcraft-review-action@v1
+        run : |
+          snapcraft remote-build --launchpad-accept-public-upload
+          
+          version="$(cat snap/snapcraft.yaml | yq -r '.version')"
+          echo "{amd64_snap}={signal_desktop_$version_amd64.snap}" >> "$GITHUB_OUTPUT"
+          echo "{arm64_snap}={signal_desktop_$version_arm64.snap}" >> "$GITHUB_OUTPUT"
+
+      - name: Review the built amd64 snap
+        uses: diddlesnaps/snapcraft-review-action@v1
         with:
-          snap: ${{ steps.build.outputs.snap }}
+          snap: ${{ steps.build.outputs.amd64_snap }}
           isClassic: 'false'
-      - uses: snapcore/action-publish@v1
+
+      - name: Review the built arm64 snap
+        uses: diddlesnaps/snapcraft-review-action@v1
+        with:
+          snap: ${{ steps.build.outputs.arm64_snap }}
+          isClassic: 'false'
+
+      - name: Publish the amd64 snap
+        uses: snapcore/action-publish@v1
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_CANDIDATE }}
         with:
-          snap: ${{ steps.build.outputs.snap }}
+          snap: ${{ steps.build.outputs.amd64_snap }}
+          release: ${{ env.CHANNEL }}
+
+      - name: Publish the arm64 snap
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_CANDIDATE }}
+        with:
+          snap: ${{ steps.build.outputs.arm64_snap }}
           release: ${{ env.CHANNEL }}
           
   create_issue:
