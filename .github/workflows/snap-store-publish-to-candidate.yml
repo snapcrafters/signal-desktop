@@ -72,7 +72,7 @@ jobs:
       - name: Publish the built snap
         id: publish
         env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_STABLE }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_CANDIDATE }}
           SNAP_NAME: ${{ steps.build.outputs.snap }}
           ARCHITECTURE: ${{ matrix.architecture }}
         run: |
