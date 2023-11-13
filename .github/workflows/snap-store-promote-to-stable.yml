@@ -37,7 +37,8 @@ jobs:
           arguments=(${{ steps.command.outputs.command-arguments }})
           revision=${arguments[0]}
           channel=${arguments[1]}
-          
+          done=${arguments[2]}
+
           # Validation checks
           re='^[0-9]+([,][0-9]+)*$'
           if [[ ! "$revision" =~ $re ]]; then
@@ -47,7 +48,11 @@ jobs:
           if [[ "$channel" != "stable"  ]]; then
             echo "I can only promote to stable, not '$channel'!"
             exit 1
-          fi 
+          fi
+          if [[ -n "$done" && "$done" != "done"  ]]; then
+            echo "The third argument should be 'done' or empty"
+            exit 1
+          fi
 
           # Install Snapcraft
           sudo snap install --classic snapcraft
@@ -56,7 +61,7 @@ jobs:
           # Iterate over each specified revision and release
           revs=$(echo $revision | tr "," "\n")
           released_revs=()
-          
+
           for r in $revs; do
             snapcraft release $SNAP_NAME "$r" "$channel"
             released_revs+="$r"
@@ -64,6 +69,7 @@ jobs:
 
           echo "revisions=${released_revs[@]}" >> $GITHUB_OUTPUT
           echo "channel=$channel" >> $GITHUB_OUTPUT
+          echo "done=$done" >> $GITHUB_OUTPUT
       - uses: actions/github-script@v6
         with:
           script: |
@@ -72,10 +78,12 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'The following revisions were released to the `${{ steps.promote.outputs.channel }}` channel: `${{ steps.promote.outputs.revisions }}`'
-            })
-            github.rest.issues.update({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'closed'
-            })
+            })          
+            if ("${{ steps.promote.outputs.done }}" === "done") {
+              github.rest.issues.update({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'closed'
+              })
+            }
