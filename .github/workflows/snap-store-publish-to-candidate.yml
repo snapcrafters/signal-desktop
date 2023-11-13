@@ -27,7 +27,7 @@ env:
 
 jobs:
   build:
-    name: "Build and publish snap"
+    name: "Build & publish"
     environment: "Candidate Branch"
     runs-on: ubuntu-latest
     strategy:
@@ -73,7 +73,7 @@ jobs:
         id: publish
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_STABLE }}
-          SNAP_NAME: ${{ steps.build.outputs.amd64_snap }}
+          SNAP_NAME: ${{ steps.build.outputs.snap }}
           ARCHITECTURE: ${{ matrix.architecture }}
         run: |
           rev=$(snapcraft push $SNAP_NAME --release=$CHANNEL)
