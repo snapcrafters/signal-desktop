@@ -55,19 +55,19 @@ jobs:
           snapcraft remote-build --launchpad-accept-public-upload
           
           version="$(cat snap/snapcraft.yaml | yq -r '.version')"
-          echo "{amd64_snap}={signal_desktop_$version_amd64.snap}" >> "$GITHUB_OUTPUT"
-          echo "{arm64_snap}={signal_desktop_$version_arm64.snap}" >> "$GITHUB_OUTPUT"
+          echo "amd64=signal_desktop_${version}_amd64.snap" >> "$GITHUB_OUTPUT"
+          echo "arm64=signal_desktop_${version}_arm64.snap" >> "$GITHUB_OUTPUT"
 
       - name: Review the built amd64 snap
         uses: diddlesnaps/snapcraft-review-action@v1
         with:
-          snap: ${{ steps.build.outputs.amd64_snap }}
+          snap: ${{ steps.build.outputs.amd64 }}
           isClassic: 'false'
 
       - name: Review the built arm64 snap
         uses: diddlesnaps/snapcraft-review-action@v1
         with:
-          snap: ${{ steps.build.outputs.arm64_snap }}
+          snap: ${{ steps.build.outputs.arm64 }}
           isClassic: 'false'
 
       - name: Publish the amd64 snap
@@ -75,7 +75,7 @@ jobs:
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_CANDIDATE }}
         with:
-          snap: ${{ steps.build.outputs.amd64_snap }}
+          snap: ${{ steps.build.outputs.amd64 }}
           release: ${{ env.CHANNEL }}
 
       - name: Publish the arm64 snap
@@ -83,7 +83,7 @@ jobs:
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_CANDIDATE }}
         with:
-          snap: ${{ steps.build.outputs.arm64_snap }}
+          snap: ${{ steps.build.outputs.arm64 }}
           release: ${{ env.CHANNEL }}
           
   create_issue:
