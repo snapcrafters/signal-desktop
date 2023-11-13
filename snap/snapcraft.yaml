@@ -43,7 +43,7 @@ parts:
   # The purpose of this part is to introduce proxy awareness so the build succeeds in LP.
   ringrtc:
     plugin: dump
-    source: https://registry.npmjs.org/@signalapp/ringrtc/-/ringrtc-2.33.0.tgz
+    source: https://registry.npmjs.org/@signalapp/ringrtc/-/ringrtc-2.34.0.tgz
     override-build: |
       # Patch the file; inject a proxy agent at the top of the file
       cat <<-EOF > scripts/fetch-prebuild.js
