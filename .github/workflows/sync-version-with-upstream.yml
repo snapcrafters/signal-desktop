@@ -37,6 +37,8 @@ jobs:
             # Update the @signalapp/bettersqlite version if required
             BETTERSQLITE_VERSION="$(cat package.json | jq -r '.dependencies."@signalapp/better-sqlite3"')"
             sed -i -E "s|better-sqlite3-[0-9]+\.[0-9]+\.[0-9]+\.tgz|better-sqlite3-${BETTERSQLITE_VERSION}.tgz|" snap/snapcraft.yaml
+
+            rm package.json
           fi
       - name: Check for modified files
         id: git-check
