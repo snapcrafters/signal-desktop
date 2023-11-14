@@ -14,7 +14,7 @@ jobs:
     environment: "Candidate Branch"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.SNAPCRAFTERS_BOT_COMMIT }}
       - name: Fetch release version
