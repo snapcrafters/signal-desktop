@@ -27,7 +27,7 @@ source-code: https://github.com//snapcrafters/signal-desktop
 license: AGPL-3.0-only
 adopt-info: signal-desktop
 icon: snap/gui/signal-desktop.png
-version: 6.38.0
+version: 6.39.0
 
 base: core22
 grade: stable
@@ -44,7 +44,7 @@ parts:
   # The purpose of this part is to introduce proxy awareness so the build succeeds in LP.
   ringrtc:
     plugin: dump
-    source: https://registry.npmjs.org/@signalapp/ringrtc/-/ringrtc-2.34.0.tgz
+    source: https://registry.npmjs.org/@signalapp/ringrtc/-/ringrtc-2.34.1.tgz
     override-build: |
       # Patch the file; inject a proxy agent at the top of the file
       cat <<-EOF > scripts/fetch-prebuild.js
