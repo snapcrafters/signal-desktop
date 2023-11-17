@@ -203,6 +203,11 @@ parts:
       - -opt/Signal/resources/app.asar.unpacked/node_modules/sharp/vendor/lib
       - -opt/Signal/resources/app.asar.unpacked/node_modules/sharp/vendor/include
 
+  local-parts:
+    plugin: dump
+    source: ./snap/local
+    source-type: local
+
   cleanup:
     after: [signal-desktop]
     plugin: nil
@@ -219,7 +224,7 @@ parts:
 apps:
   signal-desktop:
     extensions: [gnome]
-    command: opt/Signal/signal-desktop --use-tray-icon --no-sandbox
+    command: usr/bin/signal-desktop-wrapper
     plugs:
       - browser-support
       - camera

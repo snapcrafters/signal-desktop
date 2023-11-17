@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Run the configure hook which sets defaults for any config options
+"${SNAP}/snap/hooks/configure"
+
+# Grab the config options
+tray_icon="$(snapctl get tray-icon)"
+
+# Define an array of command line options
+opts=()
+
+# If the the tray icon is enabled, add to the list of command line args
+if [[ "${tray_icon}" == "true" ]]; then
+    opts+=("--use-tray-icon")
+fi
+
+# Run signal-desktop with the gathered arguments
+exec "${SNAP}/opt/Signal/signal-desktop" "--no-sandbox" "${opts[@]}"
