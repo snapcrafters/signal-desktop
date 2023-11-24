@@ -32,6 +32,6 @@ Maintainers can promote this to stable by commenting `/promote <rev>[,<rev>] sta
 
 > For example
 >
-> * To promote a single revision, run `/promote 34 stable`
-> * To promote multiple revisions, run `/promote 34,35 stable`
-> * To promote a revision and close the issue, run `/promote 34,35 stable done`
+> * To promote a single revision, run `/promote <rev> stable`
+> * To promote multiple revisions, run `/promote <rev>,<rev> stable`
+> * To promote a revision and close the issue, run `/promote <rev>,<rev> stable done`
