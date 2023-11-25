@@ -127,12 +127,12 @@ jobs:
           sleep 20
 
           screenshot_full="$(.github/vmctl screenshot-full)"
+          echo "Screenshot of full screen at: $screenshot_screen"
           echo "screen=$screenshot_full" >> "$GITHUB_OUTPUT"
-          echo "Screenshot of full screen at: $screen"
 
           screenshot_window="$(.github/vmctl screenshot-window)"
+          echo "Screenshot of window at: $screenshot_window"
           echo "window=$screenshot_window" >> "$GITHUB_OUTPUT"
-          echo "Screenshot of window at: $window"
 
           # Output the Signal logs captured from stdout/stderr (for debgging if required)
           .github/vmctl exec "cat /home/ubuntu/signal.log"
