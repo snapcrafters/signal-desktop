@@ -21,3 +21,8 @@ stage/
 
 # Debug
 squashfs-root
+
+# The .github/vmctl script fetches screenshots from a running vm, using these
+# filenames by default.
+screenshot-screen.png
+screenshot-window.png

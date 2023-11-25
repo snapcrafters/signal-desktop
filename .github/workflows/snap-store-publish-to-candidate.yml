@@ -33,6 +33,10 @@ jobs:
     strategy:
       matrix:
         architecture: ['amd64', 'arm64']
+    outputs:
+      revision_amd64: ${{ steps.publish.outputs.revision_amd64 }}
+      revision_arm64: ${{ steps.publish.outputs.revision_arm64 }}
+      version: ${{ steps.build.outputs.version }}
     steps:
       - name: Checkout the source
         uses: actions/checkout@v4
@@ -78,10 +82,9 @@ jobs:
         run: |
           rev=$(snapcraft push $SNAP_NAME --release=$CHANNEL)
           echo "revision_${ARCHITECTURE}=${rev}" >> $GITHUB_OUTPUT
-    outputs: 
-      revision_amd64: ${{ steps.publish.outputs.revision_amd64 }}
-      revision_arm64: ${{ steps.publish.outputs.revision_arm64 }}
-      version: ${{ steps.build.outputs.version }}
+
+  # Create an issue using the template that asks maintainers to test the snap, and take
+  # action to promote the revisions to stable if testing is successful.
   create_issue:
     name: "Create call for testing"
     needs: build
@@ -89,6 +92,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: JasonEtco/create-an-issue@v2
+        id: comment
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           revision_amd64: ${{ needs.build.outputs.revision_amd64 }}
@@ -96,3 +100,55 @@ jobs:
           version: ${{ needs.build.outputs.version }}
         with:
           filename: .github/testing-issue-template.md
+    outputs:
+      issue_number: ${{ steps.comment.outputs.number }}
+
+  # Deploy the snap inside a desktop VM and grab screenshots of the desktop, and of
+  # the application, then post them as a comment on the issue created above.
+  grab-screenshots:
+    name: Gather screenshots
+    needs: 
+      - build
+      - create_issue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Setup LXD
+        uses: canonical/setup-lxd@v0.1.1
+
+      - name: Setup test machine and start Signal
+        id: screenshots
+        run: |
+          .github/vmctl prepare
+          .github/vmctl exec "sudo snap install ${{ env.SNAP_NAME }} --revision ${{ needs.build.outputs.revision_amd64 }}"
+          .github/vmctl exec "snap run signal-desktop &>/home/ubuntu/signal.log &"
+          sleep 20
+
+          screenshot_full="$(.github/vmctl screenshot-full)"
+          echo "screen=$screenshot_full" >> "$GITHUB_OUTPUT"
+          echo "Screenshot of full screen at: $screen"
+
+          screenshot_window="$(.github/vmctl screenshot-window)"
+          echo "window=$screenshot_window" >> "$GITHUB_OUTPUT"
+          echo "Screenshot of window at: $window"
+
+          # Output the Signal logs captured from stdout/stderr (for debgging if required)
+          .github/vmctl exec "cat /home/ubuntu/signal.log"
+
+      - name: Comment on call for testing issue with screenshots
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: ${{ needs.create_issue.outputs.issue_number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `The following screenshots were taken during automated testing:
+
+              ![window](${{ steps.screenshots.outputs.window }})
+
+              ![screen](${{ steps.screenshots.outputs.screen }})
+              `
+            })
