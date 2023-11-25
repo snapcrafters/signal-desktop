@@ -85,6 +85,7 @@ Now that your git metadata has been updated you are ready to create a bugfix bra
 ## Maintainers
 
 * [@merlijn-sebrechts](https://github.com/merlijn-sebrechts/)
+* [@jnsgruk](https://github.com/jnsgruk/)
 
 ## License
 
