@@ -16,4 +16,4 @@ if [[ "${tray_icon}" == "true" ]]; then
 fi
 
 # Run signal-desktop with the gathered arguments
-exec "${SNAP}/opt/Signal/signal-desktop" "--no-sandbox" "${opts[@]}"
+exec "${SNAP}/opt/Signal/signal-desktop" "--no-sandbox" "${opts[@]}" "$@"
