@@ -13,6 +13,14 @@ description: |
   - Speak up - Whether they live across town or across the ocean, Signal's enhanced audio and video quality will make your friends and family feel closer.
   - Whisper in the shadows - Switch to the dark theme if you refuse to see the light.
 
+  **Minimize to tray**
+
+  Per the request of the Signal developers, this snap does not use the system tray by default. This is disabled by default per the request of the Signal developers, because system tray support is not stable. Set to `false`, Signal will stop when you close it and will not have a system tray icon. You can enable it by running the following command.
+
+  ```
+  snap set signal-desktop tray-icon=true
+  ```
+
   **Are you having issues?**
 
   Let us know by creating a new issue here: https://github.com/snapcrafters/signal-desktop/issues
