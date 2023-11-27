@@ -28,13 +28,33 @@ env:
   CHANNEL: 'candidate'
 
 jobs:
+  get_archs:
+    name: Compute architectures
+    runs-on: ubuntu-latest
+    outputs:
+      archs: ${{ steps.archs.outputs.archs }}
+    steps:
+      - name: Checkout the source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CHANNEL }}
+
+      - name: Compute architectures
+        id: archs
+        run: |
+          # Grab the architecture list as a JSON array
+          archs="$(cat snap/snapcraft.yaml | yq -I=0 -o=json '[.architectures[]."build-on"]')"
+          echo "archs=$archs" >> "$GITHUB_OUTPUT"
+
   build:
     name: "Build & publish"
     environment: "Candidate Branch"
     runs-on: ubuntu-latest
+    needs: [get_archs]
     strategy:
       matrix:
-        architecture: ['amd64', 'arm64']
+        # Parse the list of architectures from the output we created above (one job per arch)
+        architecture: ${{ fromJSON(needs.get_archs.outputs.archs) }}
     outputs:
       revision_amd64: ${{ steps.publish.outputs.revision_amd64 }}
       revision_arm64: ${{ steps.publish.outputs.revision_arm64 }}
@@ -51,18 +71,25 @@ jobs:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_CANDIDATE }}
         run: |
           sudo snap install snapcraft --classic
-          
+
           # Setup Launchpad credentials
           mkdir -p ~/.local/share/snapcraft/provider/launchpad
           echo "$LP_BUILD_SECRET" > ~/.local/share/snapcraft/provider/launchpad/credentials
           git config --global user.email "github-actions@github.com"
           git config --global user.name "Github Actions"
 
+          # Install moreutils so we have access to sponge
+          sudo apt-get update; sudo apt-get install -y moreutils
+
       - name: Remote build the snap
         id: build
         env:
           ARCHITECTURE: ${{ matrix.architecture }}
         run : |
+          # Remove the architecture definition from the snapcraft.yaml due to:
+          # https://bugs.launchpad.net/snapcraft/+bug/1885150
+          cat snap/snapcraft.yaml | yq 'del(.architectures)' | sponge snap/snapcraft.yaml
+
           snapcraft remote-build --launchpad-accept-public-upload --build-for=${ARCHITECTURE}
 
           version="$(cat snap/snapcraft.yaml | yq -r '.version')"
