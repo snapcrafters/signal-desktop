@@ -110,6 +110,7 @@ jobs:
   # the application, then post them as a comment on the issue created above.
   grab-screenshots:
     name: Gather screenshots
+    environment: "Candidate Branch"
     needs: 
       - build
       - create_issue
