@@ -76,7 +76,8 @@ jobs:
           SNAP_NAME: ${{ steps.build.outputs.snap }}
           ARCHITECTURE: ${{ matrix.architecture }}
         run: |
-          rev=$(snapcraft push $SNAP_NAME --release=$CHANNEL)
+          snapcraft_out="$(snapcraft push "$SNAP_NAME" --release="$CHANNEL")"
+          rev="$(echo "$snapcraft_out" | grep -Po 'Revision \K[^ ]+')"
           echo "revision_${ARCHITECTURE}=${rev}" >> $GITHUB_OUTPUT
     outputs: 
       revision_amd64: ${{ steps.publish.outputs.revision_amd64 }}
