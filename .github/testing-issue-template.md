@@ -5,10 +5,7 @@ labels: testing
 
 A new version ({{ env.version }}) of `{{ env.SNAP_NAME }}` was just pushed to the `{{ env.CHANNEL }}` channel [in the snap store](https://snapcraft.io/{{ env.SNAP_NAME }}). The following revisions are available.
 
-| CPU architecture | Revision                 |
-|------------------|--------------------------|
-| amd64            | {{ env.revision_amd64 }} |
-| arm64            | {{ env.revision_arm64 }} |
+{{ env.table }}
 
 ## Automated screenshots
 
@@ -40,8 +37,8 @@ Maintainers can promote this to stable by commenting `/promote <rev>[,<rev>] sta
 > - To promote multiple revisions, run `/promote <rev>,<rev> stable`
 > - To promote a revision and close the issue, run `/promote <rev>,<rev> stable done`
 
-You can promote both revisions just built with:
+You can promote all revisions that were just built with:
 
 ```
-/promote {{ env.revision_amd64 }},{{ env.revision_arm64 }} stable done
+/promote {{ env.revisions }} stable done
 ```
