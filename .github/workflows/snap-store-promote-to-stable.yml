@@ -64,7 +64,7 @@ jobs:
 
           for r in $revs; do
             snapcraft release $SNAP_NAME "$r" "$channel"
-            released_revs+="$r"
+            released_revs+=("$r")
           done
 
           echo "revisions=${released_revs[@]}" >> $GITHUB_OUTPUT

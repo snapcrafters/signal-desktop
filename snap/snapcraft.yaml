@@ -43,8 +43,8 @@ confinement: strict
 compression: lzo
 
 architectures:
-  - build-on: amd64
-  - build-on: arm64
+  - amd64
+  - arm64
 
 parts:
   # NodeJS dependency which uses a non-proxy aware fetch during its build.
