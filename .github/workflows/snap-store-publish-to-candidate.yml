@@ -80,7 +80,8 @@ jobs:
           SNAP_NAME: ${{ steps.build.outputs.snap }}
           ARCHITECTURE: ${{ matrix.architecture }}
         run: |
-          rev=$(snapcraft push $SNAP_NAME --release=$CHANNEL)
+          snapcraft_out="$(snapcraft push "$SNAP_NAME" --release="$CHANNEL")"
+          rev="$(echo "$snapcraft_out" | grep -Po 'Revision \K[^ ]+')"
           echo "revision_${ARCHITECTURE}=${rev}" >> $GITHUB_OUTPUT
 
   # Create an issue using the template that asks maintainers to test the snap, and take
