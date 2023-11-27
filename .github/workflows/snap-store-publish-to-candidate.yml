@@ -13,6 +13,8 @@ on:
         required: true
       LP_BUILD_SECRET:
         required: true
+      SNAPCRAFTERS_BOT_COMMIT:
+        required: true
 
 # Permissions for GITHUB_TOKEN
 permissions:
@@ -65,7 +67,7 @@ jobs:
 
           version="$(cat snap/snapcraft.yaml | yq -r '.version')"
           echo "version=${version}" >> "$GITHUB_OUTPUT"
-          echo "snap=signal-desktop_${version}_${ARCHITECTURE}.snap" >> "$GITHUB_OUTPUT"
+          echo "snap=${{ env.SNAP_NAME }}_${version}_${ARCHITECTURE}.snap" >> "$GITHUB_OUTPUT"
 
       - name: Review the built snap
         uses: diddlesnaps/snapcraft-review-action@v1
@@ -119,24 +121,47 @@ jobs:
       - name: Setup LXD
         uses: canonical/setup-lxd@v0.1.1
 
-      - name: Setup test machine and start Signal
-        id: screenshots
+      - name: Prepare VM
         run: |
           .github/vmctl prepare
           .github/vmctl exec "sudo snap install ${{ env.SNAP_NAME }} --revision ${{ needs.build.outputs.revision_amd64 }}"
-          .github/vmctl exec "snap run signal-desktop &>/home/ubuntu/signal.log &"
+          .github/vmctl exec "snap run ${{ env.SNAP_NAME }} &>/home/ubuntu/${{ env.SNAP_NAME }}.log &"
           sleep 20
 
-          screenshot_full="$(.github/vmctl screenshot-full)"
-          echo "Screenshot of full screen at: $screenshot_screen"
-          echo "screen=$screenshot_full" >> "$GITHUB_OUTPUT"
+      - name: Gather screenshots
+        run: |
+          .github/vmctl screenshot-full
+          .github/vmctl screenshot-window
 
-          screenshot_window="$(.github/vmctl screenshot-window)"
-          echo "Screenshot of window at: $screenshot_window"
-          echo "window=$screenshot_window" >> "$GITHUB_OUTPUT"
+      - name: Output application logs
+        run: |
+          .github/vmctl exec "cat /home/ubuntu/${{ env.SNAP_NAME }}.log"
 
-          # Output the Signal logs captured from stdout/stderr (for debgging if required)
-          .github/vmctl exec "cat /home/ubuntu/signal.log"
+      - name: Checkout snapcrafters/ci-screenshots
+        uses: actions/checkout@v4
+        with: 
+          repository: snapcrafters/ci-screenshots
+          path: ci-screenshots
+          token: ${{ secrets.SNAPCRAFTERS_BOT_COMMIT }}
+
+      - name: Upload screenshots to snapcrafters/ci-screenshots
+        id: screenshots
+        run: |
+          file_prefix="$(date +%Y%m%d)-${{ env.SNAP_NAME }}-${{ needs.create_issue.outputs.issue_number }}"
+
+          pushd ci-screenshots
+          mv ../screenshot-screen.png "${file_prefix}-screen.png"
+          mv ../screenshot-window.png "${file_prefix}-window.png"
+
+          git config --global user.email "merlijn.sebrechts+snapcrafters-bot@gmail.com"
+          git config --global user.name "Snapcrafters Bot"
+
+          git add -A .
+          git commit -m "data: screenshots for snapcrafters/${{ env.SNAP_NAME }}#${{ needs.create_issue.outputs.issue_number }}"
+          git push origin main
+
+          echo "screen=https://raw.githubusercontent.com/snapcrafters/ci-screenshots/main/${file_prefix}-screen.png" >> "$GITHUB_OUTPUT"
+          echo "window=https://raw.githubusercontent.com/snapcrafters/ci-screenshots/main/${file_prefix}-window.png" >> "$GITHUB_OUTPUT"
 
       - name: Comment on call for testing issue with screenshots
         uses: actions/github-script@v7

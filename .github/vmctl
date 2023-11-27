@@ -63,11 +63,6 @@ exec_in_vm() {
   lxc exec test-vm -- sudo -u ubuntu bash -c "/bin/vmctl-runner $@"
 }
 
-# Uploads the specified file to imgur and prints the URL to the image
-upload_screenshot() {
-  curl -s -X POST -F "image=@${1}" https://api.imgur.com/3/upload | jq -r '.data.link'
-}
-
 # Takes a screenshot of the full screen and pulls the file back from the VM to a file
 # named "screenshot-screen.png", and uploads to imgur, returning the URL
 screenshot_full() {
@@ -75,8 +70,6 @@ screenshot_full() {
   exec_in_vm "gnome-screenshot -f /home/ubuntu/screen.png"
   # Pull the screenshot back to the host
   lxc file pull test-vm/home/ubuntu/screen.png screenshot-screen.png
-  # Upload the screenshot to imgur and output the URL
-  upload_screenshot screenshot-screen.png
 }
 
 # Takes a screenshot of the active window and pulls the file back from the VM to a file
@@ -86,8 +79,6 @@ screenshot_window() {
   exec_in_vm "gnome-screenshot -w -f /home/ubuntu/window.png"
   # Pull the screenshot back to the host
   lxc file pull test-vm/home/ubuntu/window.png screenshot-window.png
-  # Upload the screenshot to imgur and output the URL
-  upload_screenshot screenshot-window.png
 }
 
 # Print the usage statement and exit the program
