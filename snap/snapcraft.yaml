@@ -233,18 +233,18 @@ apps:
     extensions: [gnome]
     command: usr/bin/signal-desktop-wrapper
     plugs:
+      - audio-playback
+      - audio-record
       - browser-support
       - camera
+      - desktop
+      - desktop-legacy
       - home
       - network
       - opengl
-      - audio-playback
-      - audio-record
       - removable-media
-      - unity7
-      - desktop
-      - desktop-legacy
       - screen-inhibit-control
+      - unity7
     environment:
       GTK_USE_PORTAL: "1"
       TMPDIR: $XDG_RUNTIME_DIR
