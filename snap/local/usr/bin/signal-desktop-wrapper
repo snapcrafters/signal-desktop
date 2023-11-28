@@ -18,7 +18,6 @@ fi
 
 if [[ "${wayland_native}" == "true" ]]; then
     opts+=(
-        "--enable-features=UseOzonePlatform"
         "--enable-features=WaylandWindowDecorations"
         "--ozone-platform=wayland"
     )
