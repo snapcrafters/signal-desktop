@@ -9,3 +9,8 @@ tray_icon="$(snapctl get tray-icon)"
 if [[ -z "$tray_icon" ]]; then
     snapctl set tray-icon=false
 fi
+
+wayland_native="$(snapctl get wayland-native)"
+if [[ -z "$wayland_native" ]]; then
+    snapctl set wayland-native=false
+fi

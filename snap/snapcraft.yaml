@@ -245,6 +245,7 @@ apps:
       - removable-media
       - screen-inhibit-control
       - unity7
+      - wayland
     environment:
       GTK_USE_PORTAL: "1"
       TMPDIR: $XDG_RUNTIME_DIR

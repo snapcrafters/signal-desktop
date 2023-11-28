@@ -6,6 +6,7 @@ set -euo pipefail
 
 # Grab the config options
 tray_icon="$(snapctl get tray-icon)"
+wayland_native="$(snapctl get wayland-native)"
 
 # Define an array of command line options
 opts=()
@@ -13,6 +14,14 @@ opts=()
 # If the the tray icon is enabled, add to the list of command line args
 if [[ "${tray_icon}" == "true" ]]; then
     opts+=("--use-tray-icon")
+fi
+
+if [[ "${wayland_native}" == "true" ]]; then
+    opts+=(
+        "--enable-features=UseOzonePlatform"
+        "--enable-features=WaylandWindowDecorations"
+        "--ozone-platform=wayland"
+    )
 fi
 
 # Run signal-desktop with the gathered arguments
