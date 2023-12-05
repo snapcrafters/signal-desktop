@@ -24,7 +24,7 @@ snap install signal-desktop
 
 | option       | default | description  |
 |--------------|---------|--------------|
-| tray-icon    | false   | Whether or not to use the system tray (minimize to tray) support. This is disabled by default per the request of the Signal developers, because system tray support is not stable. Set to `false`, Signal will stop when you close it and will not have a system tray icon. Set to `true`, Signal will minimize to tray wen you close it, and will have a system tray icon on supported desktops. |
+| tray-icon    | false   | Whether or not to use the system tray (minimize to tray) support. This is disabled by default per the request of the Signal developers, because system tray support is not stable. Set to `false`, Signal will stop when you close it and will not have a system tray icon. Set to `true`, Signal will minimize to tray when you close it, and will have a system tray icon on supported desktops. |
 
 You can change Snap configuration by running `snap set signal-desktop <key>=<value>`. For example, `snap set signal-desktop tray-icon=true`.
 
