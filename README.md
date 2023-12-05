@@ -8,6 +8,10 @@
 
 <p align="center">
 <a href="https://snapcraft.io/signal-desktop"><img src="https://snapcraft.io/signal-desktop/badge.svg" alt="Snap Status"></a>
+<a href="https://github.com/snapcrafters/signal-desktop/actions/workflows/release-to-candidate.yaml"><img src="https://github.com/snapcrafters/signal-desktop/actions/workflows/release-to-candidate.yaml/badge.svg"></a>
+<a href="https://github.com/snapcrafters/signal-desktop/actions/workflows/promote-to-stable.yml"><img src="https://github.com/snapcrafters/signal-desktop/actions/workflows/promote-to-stable.yml/badge.svg"></a>
+<a href="https://github.com/snapcrafters/signal-desktop/actions/workflows/pull-request.yml"><img src="https://github.com/snapcrafters/signal-desktop/actions/workflows/pull-request.yml/badge.svg"></a>
+<a href="https://github.com/snapcrafters/signal-desktop/actions/workflows/sync-version-with-upstream.yml"><img src="https://github.com/snapcrafters/signal-desktop/actions/workflows/sync-version-with-upstream.yml/badge.svg"></a>
 </p>
 
 ## Install
@@ -22,9 +26,9 @@ snap install signal-desktop
 
 ## Snap Configuration
 
-| option       | default | description  |
-|--------------|---------|--------------|
-| tray-icon    | false   | Whether or not to use the system tray (minimize to tray) support. This is disabled by default per the request of the Signal developers, because system tray support is not stable. Set to `false`, Signal will stop when you close it and will not have a system tray icon. Set to `true`, Signal will minimize to tray wen you close it, and will have a system tray icon on supported desktops. |
+| option    | default | description                                                                                                                                                                                                                                                                                                                                                                                       |
+| --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| tray-icon | false   | Whether or not to use the system tray (minimize to tray) support. This is disabled by default per the request of the Signal developers, because system tray support is not stable. Set to `false`, Signal will stop when you close it and will not have a system tray icon. Set to `true`, Signal will minimize to tray wen you close it, and will have a system tray icon on supported desktops. |
 
 You can change Snap configuration by running `snap set signal-desktop <key>=<value>`. For example, `snap set signal-desktop tray-icon=true`.
 
@@ -84,9 +88,9 @@ Now that your git metadata has been updated you are ready to create a bugfix bra
 
 ## Maintainers
 
-* [@merlijn-sebrechts](https://github.com/merlijn-sebrechts/)
-* [@jnsgruk](https://github.com/jnsgruk/)
+- [@merlijn-sebrechts](https://github.com/merlijn-sebrechts/)
+- [@jnsgruk](https://github.com/jnsgruk/)
 
 ## License
 
-* The license of both the build files in this repository and Signal Desktop itself is [GNU Affero General Public License v3.0 only](https://github.com/signalapp/Signal-Desktop/blob/main/LICENSE)
+- The license of both the build files in this repository and Signal Desktop itself is [GNU Affero General Public License v3.0 only](https://github.com/signalapp/Signal-Desktop/blob/main/LICENSE)
