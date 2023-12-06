@@ -10,7 +10,6 @@
 <a href="https://snapcraft.io/signal-desktop"><img src="https://snapcraft.io/signal-desktop/badge.svg" alt="Snap Status"></a>
 <a href="https://github.com/snapcrafters/signal-desktop/actions/workflows/release-to-candidate.yaml"><img src="https://github.com/snapcrafters/signal-desktop/actions/workflows/release-to-candidate.yaml/badge.svg"></a>
 <a href="https://github.com/snapcrafters/signal-desktop/actions/workflows/promote-to-stable.yml"><img src="https://github.com/snapcrafters/signal-desktop/actions/workflows/promote-to-stable.yml/badge.svg"></a>
-<a href="https://github.com/snapcrafters/signal-desktop/actions/workflows/pull-request.yml"><img src="https://github.com/snapcrafters/signal-desktop/actions/workflows/pull-request.yml/badge.svg"></a>
 <a href="https://github.com/snapcrafters/signal-desktop/actions/workflows/sync-version-with-upstream.yml"><img src="https://github.com/snapcrafters/signal-desktop/actions/workflows/sync-version-with-upstream.yml/badge.svg"></a>
 </p>
 
