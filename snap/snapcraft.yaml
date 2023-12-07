@@ -115,6 +115,8 @@ parts:
       # If we're in a proxy environment, we need to patch some packages
       if [[ -n "${http_proxy:-}" ]]; then
         # Setup proxy access
+        export HTTP_PROXY="${http_proxy}"
+        export HTTPS_PROXY="${https_proxy}"
         export ELECTRON_GET_USE_PROXY=1
         export GLOBAL_AGENT_HTTP_PROXY="${http_proxy}"
         export GLOBAL_AGENT_HTTPS_PROXY="${http_proxy}"
