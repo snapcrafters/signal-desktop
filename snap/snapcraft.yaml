@@ -49,22 +49,6 @@ architectures:
 parts:
   # NodeJS dependency which uses a non-proxy aware fetch during its build.
   # The purpose of this part is to introduce proxy awareness so the build succeeds in LP.
-  ringrtc:
-    plugin: dump
-    source: https://registry.npmjs.org/@signalapp/ringrtc/-/ringrtc-2.34.4.tgz
-    override-build: |
-      # Patch the file; inject a proxy agent at the top of the file
-      cat <<-EOF > scripts/fetch-prebuild.js
-        const { HttpsProxyAgent } = require('https-proxy-agent');
-        const agent = new HttpsProxyAgent('${https_proxy:-}');
-        $(cat scripts/fetch-prebuild.js)
-      EOF
-
-      # Ensure the fetch actually uses the agent
-      sed -i 's|https.get(URL, async res|https.get(URL, { agent }, async res|g' scripts/fetch-prebuild.js
-
-  # NodeJS dependency which uses a non-proxy aware fetch during its build.
-  # The purpose of this part is to introduce proxy awareness so the build succeeds in LP.
   better-sqlite3:
     plugin: dump
     source: https://registry.npmjs.org/@signalapp/better-sqlite3/-/better-sqlite3-8.6.0.tgz
@@ -101,7 +85,6 @@ parts:
 
   signal-desktop:
     after:
-      - ringrtc
       - better-sqlite3
       - nodejs
     plugin: dump
@@ -140,10 +123,6 @@ parts:
         yarn global add https-proxy-agent
         
         # Update the package.json so the build uses the patched libraries
-        cat package.json \
-          | jq -r --arg f "file:${PWD}/../../ringrtc/build" '.dependencies."@signalapp/ringrtc"=$f' \
-          | sponge package.json
-
         cat package.json \
           | jq -r --arg f "file:${PWD}/../../better-sqlite3/build" '.dependencies."@signalapp/better-sqlite3"=$f' \
           | sponge package.json
