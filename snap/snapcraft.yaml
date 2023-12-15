@@ -67,10 +67,12 @@ parts:
     plugin: dump
     source: https://github.com/asdf-vm/asdf.git
     source-tag: v0.13.1
-    build-environment:
-      - NODE_VERSION: 18.15.0
+    build-packages:
+      - jq
     override-build: |
       source "./asdf.sh"
+
+      NODE_VERSION="$(curl "https://raw.githubusercontent.com/signalapp/Signal-Desktop/v${SNAPCRAFT_PROJECT_VERSION}/package.json" | jq -r '.engines.node')"
 
       # Install the correct version of nodejs required by Signal-Desktop
       asdf plugin add nodejs
