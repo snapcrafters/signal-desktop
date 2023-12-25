@@ -68,6 +68,7 @@ parts:
     source-tag: v0.13.1
     build-packages:
       - jq
+      - curl
     override-build: |
       source "./asdf.sh"
 
