@@ -18,7 +18,7 @@ description: |
   Per the request of the Signal developers, this snap does not use the system tray by default. This is disabled by default per the request of the Signal developers, because system tray support is not stable. Set to `false`, Signal will stop when you close it and will not have a system tray icon. You can enable it by running the following command.
 
       snap set signal-desktop tray-icon=true
-  
+
 
   **Are you having issues?**
 
@@ -131,6 +131,12 @@ parts:
           | jq -r --arg f "file:${PWD}/../../better-sqlite3/build" '.dependencies."@signalapp/better-sqlite3"=$f' \
           | sponge package.json
       fi
+
+      # Build the sticker-creator
+      pushd sticker-creator
+      yarn install
+      yarn build
+      popd
 
       # Install the dependencies for the Signal-Desktop application.
       # We cannot use `--frozen-lockfile` due to the patching above.
