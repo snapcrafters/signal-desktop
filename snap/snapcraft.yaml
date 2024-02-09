@@ -72,7 +72,12 @@ parts:
     override-build: |
       source "./asdf.sh"
 
-      NODE_VERSION="$(curl "https://raw.githubusercontent.com/signalapp/Signal-Desktop/v${SNAPCRAFT_PROJECT_VERSION}/package.json" | jq -r '.engines.node')"
+      UPSTREAM_URL="https://raw.githubusercontent.com/signalapp/Signal-Desktop/v${SNAPCRAFT_PROJECT_VERSION}"
+      LINUX_CI_STEPS="$(curl -s "${UPSTREAM_URL}/.github/workflows/ci.yml")"
+
+      NODE_VERSION="$(curl "${UPSTREAM_URL}/package.json" | jq -r '.engines.node')"
+      YARN_VERSION="$(echo "$LINUX_CI_STEPS" | grep -m1 -Po "npm install -g yarn@\K[^ ]+")"
+      NPM_VERSION="$(echo "$LINUX_CI_STEPS" | grep -m1 -Po "npm install -g yarn@[\d.]+ npm@\K[^ ]+")"
 
       # Install the correct version of nodejs required by Signal-Desktop
       asdf plugin add nodejs
@@ -80,7 +85,7 @@ parts:
       asdf global nodejs "$NODE_VERSION"
 
       # Install and configure Yarn
-      npm install -g yarn 
+      npm install -g "yarn@${YARN_VERSION}" "npm@${NPM_VERSION}"
       yarn config set python /usr/bin/python3
       yarn config set proxy "${http_proxy:-}"
       yarn config set https-proxy "${https_proxy:-}"
@@ -101,7 +106,6 @@ parts:
       - wget
     build-environment:
       - SIGNAL_ENV: "production"
-      - USE_SYSTEM_FPM: "true"
     override-build: |
       # Use the version of nodejs/yarn we configured before
       source "$(pwd)/../../nodejs/build/asdf.sh"
@@ -110,9 +114,6 @@ parts:
 
       # Disable yarn auto clean functionality
       rm .yarnclean
-
-      # Don't try to build a deb (this fails on arm64)
-      cat package.json | jq '.build.linux.target = ["dir"]' | sponge package.json
 
       # If we're in a proxy environment, we need to patch some packages
       if [[ -n "${http_proxy:-}" ]]; then
@@ -155,8 +156,7 @@ parts:
       # This is the equivalent of 'yarn build-linux' which also runs 'yarn generate'
       # which is broken (as described above).
       yarn build:esbuild:prod
-      yarn build:release --publish=never
-      yarn build:electron --config.directories.output=release
+      yarn build:release --linux dir
 
       # Stage the built release. Directory is called 'linux-unpacked' for amd64,
       # and 'linux-arm64-unpacked' for arm64.
