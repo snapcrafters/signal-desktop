@@ -84,6 +84,10 @@ parts:
       asdf install nodejs "$NODE_VERSION"
       asdf global nodejs "$NODE_VERSION"
 
+      # Configure NPM proxy
+      npm config set proxy "${http_proxy:-}"
+      npm config set https-proxy "${https_proxy:-}"
+
       # Install and configure Yarn
       npm install -g "yarn@${YARN_VERSION}" "npm@${NPM_VERSION}"
       yarn config set python /usr/bin/python3
