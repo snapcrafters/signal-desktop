@@ -26,3 +26,6 @@ squashfs-root
 # filenames by default.
 screenshot-screen.png
 screenshot-window.png
+
+# remote-build logs
+signal-desktop_*.txt
