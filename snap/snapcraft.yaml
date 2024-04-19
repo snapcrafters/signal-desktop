@@ -153,7 +153,9 @@ parts:
       # that apart into its component parts.
       yarn build-protobuf
       yarn build:esbuild
-      yarn sass 
+      yarn build:icu-types
+      yarn build:compact-locales
+      yarn sass
       yarn get-expire-time
       yarn copy-components
 
