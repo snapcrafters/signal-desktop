@@ -46,22 +46,6 @@ architectures:
   - arm64
 
 parts:
-  # NodeJS dependency which uses a non-proxy aware fetch during its build.
-  # The purpose of this part is to introduce proxy awareness so the build succeeds in LP.
-  better-sqlite3:
-    plugin: dump
-    source: https://registry.npmjs.org/@signalapp/better-sqlite3/-/better-sqlite3-8.7.1.tgz
-    override-build: |
-      # Patch the file; inject a proxy agent at the top of the file
-      cat <<-EOF > deps/download.js
-        const { HttpsProxyAgent } = require('https-proxy-agent');
-        const agent = new HttpsProxyAgent('${https_proxy:-}');
-        $(cat deps/download.js)
-      EOF
-
-      # Ensure the fetch actually uses the agent
-      sed -i 's|https.get(URL, async (res)|https.get(URL, { agent }, async (res)|g' deps/download.js
-
   nodejs:
     plugin: dump
     source: https://github.com/asdf-vm/asdf.git
@@ -76,8 +60,7 @@ parts:
       LINUX_CI_STEPS="$(curl -s "${UPSTREAM_URL}/.github/workflows/ci.yml")"
 
       NODE_VERSION="$(curl "${UPSTREAM_URL}/package.json" | jq -r '.engines.node')"
-      YARN_VERSION="$(echo "$LINUX_CI_STEPS" | grep -m1 -Po "npm install -g yarn@\K[^ ]+")"
-      NPM_VERSION="$(echo "$LINUX_CI_STEPS" | grep -m1 -Po "npm install -g yarn@[\d.]+ npm@\K[^ ]+")"
+      NPM_VERSION="$(echo "$LINUX_CI_STEPS" | grep -m1 -Po "npm install -g npm@\K[^ ]+")"
 
       # Install the correct version of nodejs required by Signal-Desktop
       asdf plugin add nodejs
@@ -85,14 +68,38 @@ parts:
       asdf global nodejs "$NODE_VERSION"
 
       # Configure NPM proxy
-      npm config set proxy "${http_proxy:-}"
-      npm config set https-proxy "${https_proxy:-}"
+      npm config set -g registry https://registry.npmjs.org/
+      npm config set -g proxy "${http_proxy:-}"
+      npm config set -g https-proxy "${http_proxy:-}"
 
-      # Install and configure Yarn
-      npm install -g "yarn@${YARN_VERSION}" "npm@${NPM_VERSION}"
-      yarn config set python /usr/bin/python3
-      yarn config set proxy "${http_proxy:-}"
-      yarn config set https-proxy "${https_proxy:-}"
+      # Install pinned npm version from Signal's CI
+      npm install -g "npm@${NPM_VERSION}"
+
+  # NodeJS dependency which uses a non-proxy aware fetch during its build.
+  # The purpose of this part is to download the module and fetch the required file
+  # using curl, which does respect the proxy, which prevents the module from trying
+  # to download it with the non-proxy aware fetch.
+  better-sqlite3:
+    after:
+      - nodejs
+    plugin: dump
+    source: https://registry.npmjs.org/@signalapp/better-sqlite3/-/better-sqlite3-8.7.1.tgz
+    build-packages:
+      - curl
+    override-build: |
+      # Parse the components of the URL that the module would try to download if not present
+      base_uri="$(grep -Po "BASE_URI = \`\K[^\`]+" deps/download.js)"
+      sqlcipher_version="$(grep -Po "SQLCIPHER_VERSION = '\K[^']+" deps/download.js)"
+      openssl_version="$(grep -Po "OPENSSL_VERSION = '\K[^']+" deps/download.js)"
+      tokenizer_version="$(grep -Po "TOKENIZER_VERSION = '\K[^']+" deps/download.js)"
+      hash="$(grep -Po "HASH = '\K[^']+" deps/download.js)"
+
+      # Download the file using curl, which respects the proxy configuration
+      curl -s -o deps/sqlcipher.tar.gz "${base_uri}/sqlcipher-${sqlcipher_version}--${openssl_version}--${tokenizer_version}-${hash}.tar.gz"
+
+      # Use the version of nodejs we configured before and install node deps
+      source "$(pwd)/../../nodejs/build/asdf.sh"
+      npm install
 
   signal-desktop:
     after:
@@ -111,58 +118,50 @@ parts:
     build-environment:
       - SIGNAL_ENV: "production"
     override-build: |
-      # Use the version of nodejs/yarn we configured before
+      # Setup proxy access where needed
+      if [[ -n "${http_proxy:-}" ]]; then
+        export HTTP_PROXY="${http_proxy:-}"
+        export HTTPS_PROXY="${http_proxy:-}"
+        export ELECTRON_GET_USE_PROXY=1
+        export GLOBAL_AGENT_HTTP_PROXY="${http_proxy:-}"
+        export GLOBAL_AGENT_HTTPS_PROXY="${http_proxy:-}"
+      fi
+
+      # Use the version of nodejs we configured before
       source "$(pwd)/../../nodejs/build/asdf.sh"
 
       git lfs install
 
-      # Disable yarn auto clean functionality
-      rm .yarnclean
-
-      # If we're in a proxy environment, we need to patch some packages
-      if [[ -n "${http_proxy:-}" ]]; then
-        # Setup proxy access
-        export HTTP_PROXY="${http_proxy}"
-        export HTTPS_PROXY="${https_proxy}"
-        export ELECTRON_GET_USE_PROXY=1
-        export GLOBAL_AGENT_HTTP_PROXY="${http_proxy}"
-        export GLOBAL_AGENT_HTTPS_PROXY="${http_proxy}"
-
-        # The patch applied uses this package to ensure proxy is used
-        yarn global add https-proxy-agent
-        
-        # Update the package.json so the build uses the patched libraries
-        cat package.json \
-          | jq -r --arg f "file:${PWD}/../../better-sqlite3/build" '.dependencies."@signalapp/better-sqlite3"=$f' \
-          | sponge package.json
-      fi
+      # Update the package.json so the build uses the patched libraries
+      cat package.json \
+        | jq -r --arg f "file:${PWD}/../../better-sqlite3/build" '.dependencies."@signalapp/better-sqlite3"=$f' \
+        | sponge package.json
 
       # Build the sticker-creator
       pushd sticker-creator
-      yarn install
-      yarn build
+      npm ci --legacy-peer-deps
+      npm run build
       popd
 
       # Install the dependencies for the Signal-Desktop application.
-      # We cannot use `--frozen-lockfile` due to the patching above.
-      yarn install
+      npm install -dd --legacy-peer-deps
 
-      # This is the equivalent of 'yarn generate'. The upstream package.json
+      # This is the equivalent of 'npm run generate'. The upstream package.json
       # uses npm-run-all to run multiple things, which has a bug that prevents
       # this from succeeding in the snapcraft build env, so this just breaks
       # that apart into its component parts.
-      yarn build-protobuf
-      yarn build:esbuild
-      yarn build:icu-types
-      yarn build:compact-locales
-      yarn sass
-      yarn get-expire-time
-      yarn copy-components
+      npm run build-protobuf
+      npm run build:esbuild
+      npm run build:icu-types
+      npm run build:compact-locales
+      npm run sass
+      npm run get-expire-time
+      npm run copy-components
 
-      # This is the equivalent of 'yarn build-linux' which also runs 'yarn generate'
+      # This is the equivalent of 'npm run build-linux' which also runs 'npm run generate'
       # which is broken (as described above).
-      yarn build:esbuild:prod
-      yarn build:release --linux dir
+      npm run build:esbuild:prod
+      npm run build:release  -- --linux dir
 
       # Stage the built release. Directory is called 'linux-unpacked' for amd64,
       # and 'linux-arm64-unpacked' for arm64.
