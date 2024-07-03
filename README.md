@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="https://signal.org/assets/header/logo-f7ef605fe417d5520d38d546b3b774b4261c75220b9904da4d8b2ffc19a761ff.png" alt="Signal Desktop">
+  <img src="https://avatars.githubusercontent.com/u/702459?s=200&v=4" alt="Signal Desktop">
 </h1>
 
 <p align="center"><b>This is the snap for Signal Desktop</b>. It is a community-maintained package to easily install Signal Desktop on Ubuntu, Fedora, Debian and other major Linux distributions. It is available in the Snap Store, Ubuntu Software, and a number of other applications.</p>
