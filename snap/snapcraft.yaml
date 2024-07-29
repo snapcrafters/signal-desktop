@@ -144,7 +144,7 @@ parts:
       popd
 
       # Install the dependencies for the Signal-Desktop application.
-      npm install -dd --legacy-peer-deps
+      npm install --legacy-peer-deps
 
       # This is the equivalent of 'npm run generate'. The upstream package.json
       # uses npm-run-all to run multiple things, which has a bug that prevents
