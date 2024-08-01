@@ -153,6 +153,7 @@ parts:
       npm run build-protobuf
       npm run build:esbuild
       npm run build:icu-types
+      npm run build:dns-fallback
       npm run build:compact-locales
       npm run sass
       npm run get-expire-time
