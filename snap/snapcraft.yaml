@@ -200,6 +200,8 @@ apps:
       - desktop
       - desktop-legacy
       - screen-inhibit-control
+      - x11
+      - wayland
     environment:
       GTK_USE_PORTAL: "1"
       TMPDIR: $XDG_RUNTIME_DIR
