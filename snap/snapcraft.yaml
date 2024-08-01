@@ -36,14 +36,14 @@ adopt-info: signal-desktop
 icon: snap/gui/signal-desktop.png
 version: 7.18.0
 
-base: core22
+base: core24
 grade: stable
 confinement: strict
 compression: lzo
 
-architectures:
-  - amd64
-  - arm64
+platforms:
+  amd64:
+  arm64:
 
 parts:
   nodejs:
@@ -212,10 +212,10 @@ parts:
   cleanup:
     after: [signal-desktop]
     plugin: nil
-    build-snaps: [gnome-42-2204]
+    build-snaps: [gnome-46-2404]
     override-prime: |
       set -eux
-      cd /snap/gnome-42-2204/current
+      cd /snap/gnome-46-2404/current
       find . -type f,l -exec rm -f $CRAFT_PRIME/{} \;
       for CRUFT in bug lintian man; do
         rm -rf $CRAFT_PRIME/usr/share/$CRUFT
