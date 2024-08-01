@@ -192,13 +192,10 @@ apps:
       - camera
       - home
       - network
-      - opengl
       - audio-playback
       - audio-record
       - removable-media
       - unity7
-      - desktop
-      - desktop-legacy
       - screen-inhibit-control
     environment:
       GTK_USE_PORTAL: "1"
