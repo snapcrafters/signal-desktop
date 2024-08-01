@@ -131,12 +131,6 @@ parts:
 
       git lfs install
 
-      # When running `npm run build:dns-fallback`, the code tries to use `dns.lookup` from
-      # the NodeJS standard library, which makes a `getaddrinfo` syscall to try and resolve
-      # domain names, which seems to fail on Launchpad builders. This patch replaces the
-      # logic to use `dns.resolve4` and `dns.resolve6` instead.
-      git apply $CRAFT_PROJECT_DIR/snap/patches/dns-fallback-use-resolve.patch
-
       # Update the package.json so the build uses the patched libraries
       cat package.json \
         | jq -r --arg f "file:${PWD}/../../better-sqlite3/build" '.dependencies."@signalapp/better-sqlite3"=$f' \
@@ -158,7 +152,6 @@ parts:
       npm run build-protobuf
       npm run build:esbuild
       npm run build:icu-types
-      npm run build:dns-fallback
       npm run build:compact-locales
       npm run sass
       npm run get-expire-time
