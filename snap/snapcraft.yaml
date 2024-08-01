@@ -171,13 +171,11 @@ parts:
       - libxss1
       - libnspr4
       - libnss3
-      - libvips42
     prime:
       - opt
       - usr/share
       - usr/lib/*/libxss*
       - usr/lib/*/*nss*
-      - usr/lib/*/libvips*
       - usr/lib/*/libI*
       - usr/lib/*/libMagic*
       - usr/lib/*/libcfit*
