@@ -114,7 +114,6 @@ parts:
       - jq
       - moreutils
       - python3
-      - wget
     build-environment:
       - SIGNAL_ENV: "production"
     override-build: |
@@ -131,6 +130,12 @@ parts:
       source "$(pwd)/../../nodejs/build/asdf.sh"
 
       git lfs install
+
+      # When running `npm run build:dns-fallback`, the code tries to use `dns.lookup` from
+      # the NodeJS standard library, which makes a `getaddrinfo` syscall to try and resolve
+      # domain names, which seems to fail on Launchpad builders. This patch replaces the
+      # logic to use `dns.resolve4` and `dns.resolve6` instead.
+      git apply $CRAFT_PROJECT_DIR/snap/patches/dns-fallback-use-resolve.patch
 
       # Update the package.json so the build uses the patched libraries
       cat package.json \
@@ -153,6 +158,7 @@ parts:
       npm run build-protobuf
       npm run build:esbuild
       npm run build:icu-types
+      npm run build:dns-fallback
       npm run build:compact-locales
       npm run sass
       npm run get-expire-time
@@ -167,37 +173,7 @@ parts:
       # and 'linux-arm64-unpacked' for arm64.
       mkdir -p "${CRAFT_PART_INSTALL}/opt"
       mv release/linux-*unpacked "${CRAFT_PART_INSTALL}/opt/Signal"
-    stage-packages:
-      - libxss1
-      - libnspr4
-      - libnss3
     prime:
-      - opt
-      - usr/share
-      - usr/lib/*/libxss*
-      - usr/lib/*/*nss*
-      - usr/lib/*/libI*
-      - usr/lib/*/libMagic*
-      - usr/lib/*/libcfit*
-      - usr/lib/*/libcgif*
-      - usr/lib/*/libexif*
-      - usr/lib/*/libfftw*
-      - usr/lib/*/libgsf*
-      - usr/lib/*/libheif*
-      - usr/lib/*/libimage*
-      - usr/lib/*/libmat*
-      - usr/lib/*/libopensli*
-      - usr/lib/*/libwebp*
-      - usr/lib/*/libHalf*
-      - usr/lib/*/libaom*
-      - usr/lib/*/libdav1d*
-      - usr/lib/*/libx265*
-      - usr/lib/*/libhdf*
-      - usr/lib/*/libsz*
-      - usr/lib/*/liblqr*
-      - usr/lib/*/libaec*
-      - usr/lib/*/libde265*
-      - usr/lib/*/libnuma*
       - -opt/Signal/chrome-sandbox
       - -opt/Signal/resources/app.asar.unpacked/node_modules/sharp/vendor/lib
       - -opt/Signal/resources/app.asar.unpacked/node_modules/sharp/vendor/include
@@ -206,19 +182,6 @@ parts:
     plugin: dump
     source: ./snap/local
     source-type: local
-
-  cleanup:
-    after: [signal-desktop]
-    plugin: nil
-    build-snaps: [gnome-46-2404]
-    override-prime: |
-      set -eux
-      cd /snap/gnome-46-2404/current
-      find . -type f,l -exec rm -f $CRAFT_PRIME/{} \;
-      for CRUFT in bug lintian man; do
-        rm -rf $CRAFT_PRIME/usr/share/$CRUFT
-      done
-      find $CRAFT_PRIME/usr/share/doc/ -type f -not -name 'copyright' -delete
 
 apps:
   signal-desktop:
@@ -237,6 +200,8 @@ apps:
       - desktop
       - desktop-legacy
       - screen-inhibit-control
+      - x11
+      - wayland
     environment:
       GTK_USE_PORTAL: "1"
       TMPDIR: $XDG_RUNTIME_DIR

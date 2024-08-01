@@ -29,3 +29,4 @@ screenshot-window.png
 
 # remote-build logs
 signal-desktop_*.txt
+snapcraft-signal-desktop*.txt
