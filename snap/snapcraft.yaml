@@ -34,7 +34,7 @@ source-code: https://github.com//snapcrafters/signal-desktop
 license: AGPL-3.0-only
 adopt-info: signal-desktop
 icon: snap/gui/signal-desktop.png
-version: 7.22.2
+version: 7.23.0
 
 base: core24
 grade: stable
@@ -83,7 +83,7 @@ parts:
     after:
       - nodejs
     plugin: dump
-    source: https://registry.npmjs.org/@signalapp/better-sqlite3/-/better-sqlite3-8.7.1.tgz
+    source: https://registry.npmjs.org/@signalapp/better-sqlite3/-/better-sqlite3-8.8.0.tgz
     build-packages:
       - curl
     override-build: |
