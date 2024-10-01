@@ -194,7 +194,6 @@ apps:
       - removable-media
       - unity7
       - screen-inhibit-control
-      - password-manager-service
     environment:
       TMPDIR: $XDG_RUNTIME_DIR
       # Included temporarily until https://github.com/snapcore/snapcraft-desktop-integration/issues/28

@@ -16,7 +16,7 @@ opts=(
     # snap/flatpak environments, which means that Signal loses access to the encryption
     # key used to encrypt the local database, and needs to be re-linked (losing all message
     # history) every time it's launched.
-    "--password-store="basic"
+    "--password-store=basic"
 )
 
 # If the the tray icon is enabled, add to the list of command line args
