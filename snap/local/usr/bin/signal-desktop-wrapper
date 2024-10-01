@@ -8,7 +8,16 @@ set -euo pipefail
 tray_icon="$(snapctl get tray-icon)"
 
 # Define an array of command line options
-opts=()
+opts=(
+    # Don't run the chrome sandbox inside the snap environment, rely on AppArmor confinement
+    "--no-sandbox"
+    # See https://github.com/snapcrafters/signal-desktop/issues/300
+    # An upstream Chrome issue blocks the correct inovation of libsecret from within
+    # snap/flatpak environments, which means that Signal loses access to the encryption
+    # key used to encrypt the local database, and needs to be re-linked (losing all message
+    # history) every time it's launched.
+    "--password-store="basic"
+)
 
 # If the the tray icon is enabled, add to the list of command line args
 if [[ "${tray_icon}" == "true" ]]; then
@@ -16,4 +25,4 @@ if [[ "${tray_icon}" == "true" ]]; then
 fi
 
 # Run signal-desktop with the gathered arguments
-exec "${SNAP}/opt/Signal/signal-desktop" "--no-sandbox" "${opts[@]}" "$@"
+exec "${SNAP}/opt/Signal/signal-desktop" "${opts[@]}" "$@"
