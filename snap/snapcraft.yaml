@@ -180,6 +180,12 @@ parts:
     source: ./snap/local
     source-type: local
 
+plugs:
+  dbus-secrets:
+    interface: dbus
+    bus: session
+    name: org.freedesktop.secrets
+
 apps:
   signal-desktop:
     extensions: [gnome]
@@ -194,7 +200,7 @@ apps:
       - removable-media
       - unity7
       - screen-inhibit-control
-      - password-manager-service
+      - dbus-secrets
     environment:
       TMPDIR: $XDG_RUNTIME_DIR
       # Included temporarily until https://github.com/snapcore/snapcraft-desktop-integration/issues/28
