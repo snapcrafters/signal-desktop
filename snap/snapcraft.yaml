@@ -170,6 +170,8 @@ parts:
       # and 'linux-arm64-unpacked' for arm64.
       mkdir -p "${CRAFT_PART_INSTALL}/opt"
       mv release/linux-*unpacked "${CRAFT_PART_INSTALL}/opt/Signal"
+    stage-packages:
+      - libnss3
     prime:
       - -opt/Signal/chrome-sandbox
       - -opt/Signal/resources/app.asar.unpacked/node_modules/sharp/vendor/lib
