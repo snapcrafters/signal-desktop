@@ -90,12 +90,10 @@ parts:
       # Parse the components of the URL that the module would try to download if not present
       base_uri="$(grep -Po "BASE_URI = \`\K[^\`]+" deps/download.js)"
       sqlcipher_version="$(grep -Po "SQLCIPHER_VERSION = '\K[^']+" deps/download.js)"
-      openssl_version="$(grep -Po "OPENSSL_VERSION = '\K[^']+" deps/download.js)"
-      tokenizer_version="$(grep -Po "TOKENIZER_VERSION = '\K[^']+" deps/download.js)"
       hash="$(grep -Po "HASH = '\K[^']+" deps/download.js)"
 
       # Download the file using curl, which respects the proxy configuration
-      curl -s -o deps/sqlcipher.tar.gz "${base_uri}/sqlcipher-${sqlcipher_version}--${openssl_version}--${tokenizer_version}-${hash}.tar.gz"
+      curl -s -o deps/sqlcipher.tar.gz "${base_uri}/sqlcipher-v2-${sqlcipher_version}--${hash}.tar.gz"
 
       # Use the version of nodejs we configured before and install node deps
       source "$(pwd)/../../nodejs/build/asdf.sh"
