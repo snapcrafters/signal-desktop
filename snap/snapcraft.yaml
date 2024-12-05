@@ -143,7 +143,7 @@ parts:
 
       # Add a patch that fixes the rendering of images on arm64 builds.
       # See: https://github.com/snapcrafters/signal-desktop/issues/279#issuecomment-2372021170
-      cp $CRAFT_PROJECT_DIR/snap/patches/fs-extra+5.0.0.patch patches/fs-extra+5.0.0.patch
+      cp $CRAFT_PROJECT_DIR/snap/patches/* patches/
 
       # Install the dependencies for the Signal-Desktop application.
       npm install --legacy-peer-deps
