@@ -46,44 +46,15 @@ platforms:
   arm64:
 
 parts:
-  nodejs:
-    plugin: dump
-    source: https://github.com/asdf-vm/asdf.git
-    source-tag: v0.13.1
-    build-packages:
-      - jq
-      - curl
-    override-build: |
-      source "./asdf.sh"
-
-      UPSTREAM_URL="https://raw.githubusercontent.com/signalapp/Signal-Desktop/v${SNAPCRAFT_PROJECT_VERSION}"
-      LINUX_CI_STEPS="$(curl -s "${UPSTREAM_URL}/.github/workflows/ci.yml")"
-
-      NODE_VERSION="$(curl "${UPSTREAM_URL}/package.json" | jq -r '.engines.node')"
-      NPM_VERSION="$(echo "$LINUX_CI_STEPS" | grep -m1 -Po "npm install -g npm@\K[^ ]+")"
-
-      # Install the correct version of nodejs required by Signal-Desktop
-      asdf plugin add nodejs
-      asdf install nodejs "$NODE_VERSION"
-      asdf global nodejs "$NODE_VERSION"
-
-      # Configure NPM proxy
-      npm config set -g registry https://registry.npmjs.org/
-      npm config set -g proxy "${http_proxy:-}"
-      npm config set -g https-proxy "${http_proxy:-}"
-
-      # Install pinned npm version from Signal's CI
-      npm install -g "npm@${NPM_VERSION}"
-
   # NodeJS dependency which uses a non-proxy aware fetch during its build.
   # The purpose of this part is to download the module and fetch the required file
   # using curl, which does respect the proxy, which prevents the module from trying
   # to download it with the non-proxy aware fetch.
   better-sqlite3:
-    after:
-      - nodejs
     plugin: dump
     source: https://registry.npmjs.org/@signalapp/better-sqlite3/-/better-sqlite3-9.0.8.tgz
+    build-snaps:
+      - node/20/stable
     build-packages:
       - curl
     override-build: |
@@ -96,18 +67,17 @@ parts:
       # Download the file using curl, which respects the proxy configuration
       curl -s -o deps/sqlcipher.tar.gz "${base_uri}/sqlcipher-v2-${sqlcipher_version}--${extension_version}-${hash}.tar.gz"
 
-      # Use the version of nodejs we configured before and install node deps
-      source "$(pwd)/../../nodejs/build/asdf.sh"
       npm install
 
   signal-desktop:
     after:
       - better-sqlite3
-      - nodejs
     plugin: dump
     source: https://github.com/signalapp/Signal-Desktop
     source-type: git
     source-tag: v$SNAPCRAFT_PROJECT_VERSION
+    build-snaps:
+      - node/20/stable
     build-packages:
       - git-lfs
       - jq
@@ -124,9 +94,6 @@ parts:
         export GLOBAL_AGENT_HTTP_PROXY="${http_proxy:-}"
         export GLOBAL_AGENT_HTTPS_PROXY="${http_proxy:-}"
       fi
-
-      # Use the version of nodejs we configured before
-      source "$(pwd)/../../nodejs/build/asdf.sh"
 
       git lfs install
 
