@@ -138,9 +138,11 @@ parts:
       mkdir -p "${CRAFT_PART_INSTALL}/opt"
       mv release/linux-*unpacked "${CRAFT_PART_INSTALL}/opt/Signal"
 
-      # Remove execstack from better_sqlite3 binary to pass snap review.
-      # See: https://forum.snapcraft.io/t/snap-and-executable-stacks/1812
-      execstack --clear-execstack "${CRAFT_PART_INSTALL}/opt/Signal/resources/app.asar.unpacked/node_modules/@signalapp/better-sqlite3/build/Release/better_sqlite3.node"
+      if [[ "$(uname -m)" == "x86_64" ]]; then
+        # Remove execstack from better_sqlite3 binary to pass snap review.
+        # See: https://forum.snapcraft.io/t/snap-and-executable-stacks/1812
+        execstack --clear-execstack "${CRAFT_PART_INSTALL}/opt/Signal/resources/app.asar.unpacked/node_modules/@signalapp/better-sqlite3/build/Release/better_sqlite3.node"
+      fi
     stage-packages:
       - libnss3
       - libnss-sss
