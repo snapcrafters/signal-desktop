@@ -46,39 +46,13 @@ platforms:
   arm64:
 
 parts:
-  # NodeJS dependency which uses a non-proxy aware fetch during its build.
-  # The purpose of this part is to download the module and fetch the required file
-  # using curl, which does respect the proxy, which prevents the module from trying
-  # to download it with the non-proxy aware fetch.
-  better-sqlite3:
-    plugin: dump
-    source: https://registry.npmjs.org/@signalapp/better-sqlite3/-/better-sqlite3-9.0.13.tgz
-    build-snaps:
-      - node/20/stable
-    build-packages:
-      - curl
-    override-build: |
-      # Parse the components of the URL that the module would try to download if not present
-      base_uri="$(grep -Po "BASE_URI = \`\K[^\`]+" deps/download.js)"
-      sqlcipher_version="$(grep -Po "SQLCIPHER_VERSION = '\K[^']+" deps/download.js)"
-      hash="$(grep -Po "HASH = '\K[^']+" deps/download.js)"
-      extension_version="$(grep -Po "EXTENSION_VERSION = '\K[^']+" deps/download.js)"
-
-      # Download the file using curl, which respects the proxy configuration
-      curl -s -o deps/sqlcipher.tar.gz "${base_uri}/sqlcipher-v2-${sqlcipher_version}--${extension_version}-${hash}.tar.gz"
-
-      npm install
-
   signal-desktop:
-    after:
-      - better-sqlite3
     plugin: dump
     source: https://github.com/signalapp/Signal-Desktop
     source-type: git
     source-tag: v$SNAPCRAFT_PROJECT_VERSION
-    build-snaps:
-      - node/20/stable
     build-packages:
+      - curl
       - execstack
       - git-lfs
       - jq
@@ -96,25 +70,28 @@ parts:
         export GLOBAL_AGENT_HTTPS_PROXY="${http_proxy:-}"
       fi
 
-      # Install pnpm for managing dependencies, as per the upstream.
-      npm install -g pnpm@latest-10
+      # Install pnpm and the correct version of nodejs
+      curl -fsSL https://get.pnpm.io/install.sh | env SHELL=bash sh -
+      export PATH="/root/.local/share/pnpm:$PATH"
+      export PNPM_HOME="/root/.local/share/pnpm"
+      pnpm env use --global "$(jq -r .engines.node package.json)"
 
       git lfs install
 
-      # Update the package.json so the build uses the patched libraries
-      cat package.json \
-        | jq -r --arg f "file:${PWD}/../../better-sqlite3/build" '.dependencies."@signalapp/better-sqlite3"=$f' \
-        | sponge package.json
-
       # Build the sticker-creator
-      pushd sticker-creator
-      pnpm install
-      pnpm run build
-      popd
+      pnpm --prefix ./sticker-creator/ install
+      pnpm --prefix ./sticker-creator/ run build
 
       # Add a patch that fixes the rendering of images on arm64 builds.
       # See: https://github.com/snapcrafters/signal-desktop/issues/279#issuecomment-2372021170
       cp $CRAFT_PROJECT_DIR/snap/patches/* patches/
+
+      # Apply patches
+      cat package.json | jq -r \
+        --arg fs_extra patches/fs-extra+11.2.0.patch \
+        --arg better_sqlite patches/@signalapp__better-sqlite3.patch \
+        '.pnpm.patchedDependencies."fs-extra"=$fs_extra | .pnpm.patchedDependencies."@signalapp/better-sqlite3"=$better_sqlite' \
+        | sponge package.json
 
       # Install the dependencies for the Signal-Desktop application.
       pnpm install
@@ -175,6 +152,3 @@ apps:
       - screen-inhibit-control
     environment:
       TMPDIR: $XDG_RUNTIME_DIR
-      # Included temporarily until https://github.com/snapcore/snapcraft-desktop-integration/issues/28
-      # is resolved.
-      NOTIFY_IGNORE_PORTAL: 1

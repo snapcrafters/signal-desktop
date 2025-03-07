@@ -1,7 +1,7 @@
-diff --git a/node_modules/fs-extra/lib/ensure/file.js b/node_modules/fs-extra/lib/ensure/file.js
-index a55c2d9..95760e0 100644
---- a/node_modules/fs-extra/lib/ensure/file.js
-+++ b/node_modules/fs-extra/lib/ensure/file.js
+diff --git a/lib/ensure/file.js b/lib/ensure/file.js
+index a55c2d96351919ea10da7e388bf9e98637203da2..448091a164be974696a02259aa9ee2bc8e605474 100644
+--- a/lib/ensure/file.js
++++ b/lib/ensure/file.js
 @@ -5,6 +5,19 @@ const path = require('path')
  const fs = require('../fs')
  const mkdir = require('../mkdirs')

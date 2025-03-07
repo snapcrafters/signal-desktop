@@ -1,0 +1,34 @@
+diff --git a/deps/download.js b/deps/download.js
+index d4ab46ff01129b9cecc71ebcde71dcd99797b35c..bc082fc4b4b58ffb398023a668da6117ecf3735c 100644
+--- a/deps/download.js
++++ b/deps/download.js
+@@ -1,3 +1,4 @@
++const { HttpsProxyAgent } = require('https-proxy-agent');
+ const https = require('https');
+ const fs = require('fs');
+ const path = require('path');
+@@ -38,7 +39,11 @@ async function main() {
+ 
+ function download() {
+   console.log(`downloading ${URL}`);
+-  https.get(URL, async (res) => {
++  let options = {};
++    if (process.env.HTTPS_PROXY != undefined) {
++      options.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
++  }
++  https.get(URL, options, async (res) => {
+     const out = fs.createWriteStream(tmpFile);
+ 
+     const hash = crypto.createHash('sha256');
+diff --git a/package.json b/package.json
+index 2abd489b10403dde8e5a97b3411838e7c81d916f..5f778fdc3e7215a10dea23bd30301e5e7e24c496 100644
+--- a/package.json
++++ b/package.json
+@@ -21,6 +21,7 @@
+   ],
+   "dependencies": {
+     "bindings": "^1.5.0",
++    "https-proxy-agent": "^7.0.6",
+     "tar": "^6.1.0"
+   },
+   "devDependencies": {
