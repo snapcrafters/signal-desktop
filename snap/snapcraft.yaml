@@ -105,7 +105,7 @@ parts:
 
       # Build the sticker-creator
       pushd sticker-creator
-      npm ci --legacy-peer-deps
+      npm install --legacy-peer-deps
       npm run build
       popd
 
