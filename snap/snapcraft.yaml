@@ -88,7 +88,7 @@ parts:
       cat package.json | jq -r \
         --arg fs_extra patches/fs-extra+11.2.0.patch \
         --arg better_sqlite patches/@signalapp__better-sqlite3.patch \
-        '.pnpm.patchedDependencies."fs-extra"=$fs_extra | .pnpm.patchedDependencies."@signalapp/better-sqlite3"=$better_sqlite' | .build.linux.target=["dir"] \
+        '.pnpm.patchedDependencies."fs-extra"=$fs_extra | .pnpm.patchedDependencies."@signalapp/better-sqlite3"=$better_sqlite' \
         | sponge package.json
 
       # Install the dependencies for the Signal-Desktop application.
