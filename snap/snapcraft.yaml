@@ -60,14 +60,12 @@ parts:
       - python3
     build-environment:
       - SIGNAL_ENV: "production"
+      - ELECTRON_GET_USE_PROXY: "1"
     override-build: |
       # Setup proxy access where needed
       if [[ -n "${http_proxy:-}" ]]; then
         export HTTP_PROXY="${http_proxy:-}"
         export HTTPS_PROXY="${http_proxy:-}"
-        export ELECTRON_GET_USE_PROXY=1
-        export GLOBAL_AGENT_HTTP_PROXY="${http_proxy:-}"
-        export GLOBAL_AGENT_HTTPS_PROXY="${http_proxy:-}"
       fi
 
       # Install pnpm and the correct version of nodejs
