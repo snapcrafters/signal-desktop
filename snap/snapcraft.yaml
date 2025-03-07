@@ -96,6 +96,9 @@ parts:
         export GLOBAL_AGENT_HTTPS_PROXY="${http_proxy:-}"
       fi
 
+      # Install pnpm for managing dependencies, as per the upstream.
+      npm install -g pnpm@latest-10
+
       git lfs install
 
       # Update the package.json so the build uses the patched libraries
@@ -105,8 +108,8 @@ parts:
 
       # Build the sticker-creator
       pushd sticker-creator
-      npm install --legacy-peer-deps
-      npm run build
+      pnpm install
+      pnpm run build
       popd
 
       # Add a patch that fixes the rendering of images on arm64 builds.
@@ -114,24 +117,24 @@ parts:
       cp $CRAFT_PROJECT_DIR/snap/patches/* patches/
 
       # Install the dependencies for the Signal-Desktop application.
-      npm install --legacy-peer-deps
+      pnpm install
 
       # This is the equivalent of 'npm run generate'. The upstream package.json
       # uses npm-run-all to run multiple things, which has a bug that prevents
       # this from succeeding in the snapcraft build env, so this just breaks
       # that apart into its component parts.
-      npm run build-protobuf
-      npm run build:esbuild
-      npm run build:icu-types
-      npm run build:compact-locales
-      npm run sass
-      npm run get-expire-time
-      npm run copy-components
+      pnpm run build-protobuf
+      pnpm run build:esbuild
+      pnpm run build:icu-types
+      pnpm run build:compact-locales
+      pnpm run sass
+      pnpm run get-expire-time
+      pnpm run copy-components
 
       # This is the equivalent of 'npm run build-linux' which also runs 'npm run generate'
       # which is broken (as described above).
-      npm run build:esbuild:prod
-      npm run build:release  -- --linux dir
+      pnpm run build:esbuild:prod
+      pnpm run build:release  -- --linux dir
 
       # Stage the built release. Directory is called 'linux-unpacked' for amd64,
       # and 'linux-arm64-unpacked' for arm64.
