@@ -61,6 +61,8 @@ parts:
     build-environment:
       - SIGNAL_ENV: "production"
       - ELECTRON_GET_USE_PROXY: "1"
+      - on arm64:
+          - USE_SYSTEM_FPM: "true"
     override-build: |
       # Setup proxy access where needed
       if [[ -n "${http_proxy:-}" ]]; then
