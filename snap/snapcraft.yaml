@@ -58,14 +58,9 @@ parts:
       - jq
       - moreutils
       - python3
-      - on arm64:
-          - ruby
-          - ruby-dev
     build-environment:
       - SIGNAL_ENV: "production"
       - ELECTRON_GET_USE_PROXY: "1"
-      - on arm64:
-          - USE_SYSTEM_FPM: "true"
     override-build: |
       # Setup proxy access where needed
       if [[ -n "${http_proxy:-}" ]]; then
@@ -78,11 +73,6 @@ parts:
       export PATH="/root/.local/share/pnpm:$PATH"
       export PNPM_HOME="/root/.local/share/pnpm"
       pnpm env use --global "$(jq -r .engines.node package.json)"
-
-      # Install fpm if on arm64
-      if [[ "$(uname -m)" == "aarch64" ]]; then
-        gem install fpm
-      fi
 
       git lfs install
 
@@ -98,7 +88,7 @@ parts:
       cat package.json | jq -r \
         --arg fs_extra patches/fs-extra+11.2.0.patch \
         --arg better_sqlite patches/@signalapp__better-sqlite3.patch \
-        '.pnpm.patchedDependencies."fs-extra"=$fs_extra | .pnpm.patchedDependencies."@signalapp/better-sqlite3"=$better_sqlite' \
+        '.pnpm.patchedDependencies."fs-extra"=$fs_extra | .pnpm.patchedDependencies."@signalapp/better-sqlite3"=$better_sqlite' | .build.linux.target=["dir"] \
         | sponge package.json
 
       # Install the dependencies for the Signal-Desktop application.
@@ -119,7 +109,7 @@ parts:
       # This is the equivalent of 'npm run build-linux' which also runs 'npm run generate'
       # which is broken (as described above).
       pnpm run build:esbuild:prod
-      pnpm run build:release -- --linux dir
+      pnpm run build:electron --config.directories.output=release --dir
 
       # Stage the built release. Directory is called 'linux-unpacked' for amd64,
       # and 'linux-arm64-unpacked' for arm64.
