@@ -79,11 +79,7 @@ parts:
       cp $CRAFT_PROJECT_DIR/snap/patches/* patches/
 
       # Apply patches
-      cat package.json | jq -r \
-        --arg fs_extra patches/fs-extra+11.2.0.patch \
-        --arg better_sqlite patches/@signalapp__better-sqlite3.patch \
-        '.pnpm.patchedDependencies."fs-extra"=$fs_extra | .pnpm.patchedDependencies."@signalapp/better-sqlite3"=$better_sqlite' \
-        | sponge package.json
+      cat package.json | jq -r --arg fs_extra patches/fs-extra+11.2.0.patch '.pnpm.patchedDependencies."fs-extra"=$fs_extra ' | sponge package.json
 
       # Install the dependencies for the Signal-Desktop application.
       pnpm install
@@ -109,12 +105,6 @@ parts:
       # and 'linux-arm64-unpacked' for arm64.
       mkdir -p "${CRAFT_PART_INSTALL}/opt"
       mv release/linux-*unpacked "${CRAFT_PART_INSTALL}/opt/Signal"
-
-      if [[ "$(uname -m)" == "x86_64" ]]; then
-        # Remove execstack from better_sqlite3 binary to pass snap review.
-        # See: https://forum.snapcraft.io/t/snap-and-executable-stacks/1812
-        execstack --clear-execstack "${CRAFT_PART_INSTALL}/opt/Signal/resources/app.asar.unpacked/node_modules/@signalapp/better-sqlite3/build/Release/better_sqlite3.node"
-      fi
     stage-packages:
       - libnss3
       - libnss-sss
