@@ -83,21 +83,9 @@ parts:
 
       # Install the dependencies for the Signal-Desktop application.
       pnpm install
-
-      # This is the equivalent of 'npm run generate'. The upstream package.json
-      # uses npm-run-all to run multiple things, which has a bug that prevents
-      # this from succeeding in the snapcraft build env, so this just breaks
-      # that apart into its component parts.
-      pnpm run build-protobuf
-      pnpm run build:esbuild
-      pnpm run build:icu-types
-      pnpm run build:compact-locales
-      pnpm run sass
-      pnpm run get-expire-time
-      pnpm run copy-components
-
-      # This is the equivalent of 'npm run build-linux' which also runs 'npm run generate'
-      # which is broken (as described above).
+      pnpm run generate
+       
+      # This is the equivalent of 'npm run build-linux' with some adjustments
       pnpm run build:esbuild:prod
       pnpm run build:electron --config.directories.output=release --dir
 
