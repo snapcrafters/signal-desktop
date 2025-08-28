@@ -24,5 +24,10 @@ if [[ "${tray_icon}" == "true" ]]; then
     opts+=("--use-tray-icon")
 fi
 
+# Until https://issues.angleproject.org/issues/431097618#comment10 is resolved.
+if [[ "$(uname -m)" == "aarch64" ]]; then
+    opts+=("--use-angle=gles")
+fi
+
 # Run signal-desktop with the gathered arguments
 exec "${SNAP}/opt/Signal/signal-desktop" "${opts[@]}" "$@"
