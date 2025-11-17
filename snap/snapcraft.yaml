@@ -71,8 +71,8 @@ parts:
       git lfs install
 
       # Build the sticker-creator
-      pnpm --prefix ./sticker-creator/ install
-      pnpm --prefix ./sticker-creator/ run build
+      pnpm -C ./sticker-creator/ install
+      pnpm -C ./sticker-creator/ run build
 
       # Add a patch that fixes the rendering of images on arm64 builds.
       # See: https://github.com/snapcrafters/signal-desktop/issues/279#issuecomment-2372021170
