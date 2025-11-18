@@ -29,5 +29,12 @@ if [[ "$(uname -m)" == "aarch64" ]]; then
     opts+=("--use-angle=gles")
 fi
 
+# If the rendering device string is 'llvmpipe' then it's likely that the
+# app will crash with hardware acceleration enabled.
+# See: https://github.com/electron/electron/issues/48321
+if glxinfo | grep -q llvmpipe; then
+    opts+=("--disable-gpu")
+fi
+
 # Run signal-desktop with the gathered arguments
 exec "${SNAP}/opt/Signal/signal-desktop" "${opts[@]}" "$@"

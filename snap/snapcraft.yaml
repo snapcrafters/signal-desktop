@@ -58,6 +58,9 @@ parts:
       - jq
       - moreutils
       - python3
+      # Needed for non-gpu accelerated workaround in wrapper script.
+      # See: https://github.com/electron/electron/issues/48321
+      - mesa-utils
     build-environment:
       - SIGNAL_ENV: "production"
       - ELECTRON_GET_USE_PROXY: "1"
