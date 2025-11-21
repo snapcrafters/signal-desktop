@@ -32,7 +32,7 @@ fi
 # If the rendering device string is 'llvmpipe' then it's likely that the
 # app will crash with hardware acceleration enabled.
 # See: https://github.com/electron/electron/issues/48321
-if glxinfo | grep -q llvmpipe; then
+if [[ "$(glxinfo)" =~ "llvmpipe" ]]; then
     opts+=("--disable-gpu")
 fi
 
