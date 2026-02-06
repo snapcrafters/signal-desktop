@@ -9,3 +9,8 @@ tray_icon="$(snapctl get tray-icon)"
 if [[ -z "$tray_icon" ]]; then
     snapctl set tray-icon=false
 fi
+
+enable_gpu="$(snapctl get enable-gpu)"
+if [[ -z "$enable_gpu" ]]; then
+    snapctl set enable-gpu=false
+fi

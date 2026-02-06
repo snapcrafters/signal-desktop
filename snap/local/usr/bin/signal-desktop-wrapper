@@ -32,7 +32,8 @@ fi
 # If the rendering device string is 'llvmpipe' then it's likely that the
 # app will crash with hardware acceleration enabled.
 # See: https://github.com/electron/electron/issues/48321
-if [[ "$(glxinfo)" =~ "llvmpipe" ]]; then
+# See: https://github.com/snapcrafters/signal-desktop/issues/422
+if [[ "${enable_gpu}" != "true" ]]; then
     opts+=("--disable-gpu")
 fi
 
