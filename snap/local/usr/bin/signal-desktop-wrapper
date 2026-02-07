@@ -6,6 +6,7 @@ set -euo pipefail
 
 # Grab the config options
 tray_icon="$(snapctl get tray-icon)"
+enable_gpu="$(snapctl get enable-gpu)"
 
 # Define an array of command line options
 opts=(
