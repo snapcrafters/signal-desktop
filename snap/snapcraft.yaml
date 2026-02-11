@@ -109,6 +109,17 @@ parts:
     source: ./snap/local
     source-type: local
 
+  # Needed because mesa-utils pulls in mesa libraries that conflict with the gpu-2404 interface
+  gpu-2404:
+    after:
+      - signal-desktop
+      - local-parts
+    source: https://github.com/canonical/gpu-snap.git
+    plugin: dump
+    override-prime: |
+      craftctl default
+      ${CRAFT_PART_SRC}/bin/gpu-2404-cleanup mesa-2404
+
 apps:
   signal-desktop:
     extensions: [gnome]
