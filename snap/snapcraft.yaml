@@ -80,6 +80,7 @@ parts:
 
       # Apply patches
       cat package.json | jq -r --arg fs_extra patches/fs-extra+11.2.0.patch '.pnpm.patchedDependencies."fs-extra"=$fs_extra ' | sponge package.json
+      patch -p1 <patches/production-desktop-name.patch
 
       # Install the dependencies for the Signal-Desktop application.
       pnpm install
