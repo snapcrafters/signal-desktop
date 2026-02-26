@@ -81,6 +81,10 @@ parts:
       # Apply patches
       cat package.json | jq -r --arg fs_extra patches/fs-extra+11.2.0.patch '.pnpm.patchedDependencies."fs-extra"=$fs_extra ' | sponge package.json
       patch -p1 <patches/production-desktop-name.patch
+      # This patch checks if Signal is the default app for URL protocols
+      # before trying to become the default. Reduces snapd settings change reqs.
+      # https://github.com/signalapp/Signal-Desktop/issues/7736
+      patch -p1 <patches/ask-default.patch
 
       # Install the dependencies for the Signal-Desktop application.
       pnpm install
