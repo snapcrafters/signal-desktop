@@ -1,0 +1,22 @@
+diff --git a/package.json b/package.json
+index 874f2e040..4e2067fd8 100644
+--- a/package.json
++++ b/package.json
+@@ -4,7 +4,7 @@
+   "name": "signal-desktop",
+   "productName": "Signal",
+   "description": "Private messaging from your desktop",
+-  "desktopName": "signal.desktop",
++  "desktopName": "signal-desktop.desktop",
+   "repository": "https://github.com/signalapp/Signal-Desktop.git",
+   "version": "8.3.0-alpha.1",
+   "license": "AGPL-3.0-only",
+@@ -522,7 +522,7 @@
+       "category": "Network;InstantMessaging;Chat",
+       "desktop": {
+         "entry": {
+-          "StartupWMClass": "signal"
++          "StartupWMClass": "signal-desktop"
+         }
+       },
+       "artifactName": "${name}_${version}_${arch}.${ext}",
