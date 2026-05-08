@@ -63,9 +63,10 @@ parts:
       - ELECTRON_GET_USE_PROXY: "1"
     override-build: |
       # Install pnpm and the correct version of nodejs
-      curl -fsSL https://get.pnpm.io/install.sh | env SHELL=bash sh -
-      export PATH="/root/.local/share/pnpm:$PATH"
       export PNPM_HOME="/root/.local/share/pnpm"
+      export PATH="$PNPM_HOME:$PATH"
+      PNPM_VERSION="$(jq -r '.packageManager // empty' package.json | sed 's/pnpm@//')"
+      curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION="${PNPM_VERSION}" SHELL=bash sh -
       pnpm env use --global "$(jq -r .engines.node package.json)"
 
       git lfs install
@@ -81,6 +82,10 @@ parts:
       # Apply patches
       cat package.json | jq -r --arg fs_extra patches/fs-extra+11.2.0.patch '.pnpm.patchedDependencies."fs-extra"=$fs_extra ' | sponge package.json
       patch -p1 <patches/production-desktop-name.patch
+
+      # Ensure node-gyp is available for native addon builds (installed via
+      # pnpm so that it lands in $PNPM_HOME, which is already on PATH).
+      pnpm add -g node-gyp
 
       # Install the dependencies for the Signal-Desktop application.
       pnpm install
