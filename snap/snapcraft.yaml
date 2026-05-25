@@ -80,7 +80,7 @@ parts:
       cp $CRAFT_PROJECT_DIR/snap/patches/* patches/
 
       # Apply patches
-      cat package.json | jq -r --arg fs_extra patches/fs-extra+11.2.0.patch '.pnpm.patchedDependencies."fs-extra"=$fs_extra ' | sponge package.json
+      cat package.json | jq -r --arg fs_extra patches/fs-extra+11.3.4.patch '.pnpm.patchedDependencies."fs-extra@11.3.4"=$fs_extra ' | sponge package.json
       patch -p1 <patches/production-desktop-name.patch
 
       # Ensure node-gyp is available for native addon builds (installed via
