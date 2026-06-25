@@ -46,13 +46,28 @@ platforms:
   arm64:
 
 parts:
+  node-runtime:
+    plugin: nil
+    build-packages:
+      - curl
+    override-build: |
+      # Install pnpm in a dedicated part so Signal's workspace hooks are not
+      # loaded while bootstrapping pnpm itself.
+      export PNPM_HOME="${CRAFT_PART_INSTALL}/pnpm"
+      export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
+      curl -fsSL https://get.pnpm.io/install.sh -o /tmp/install-pnpm.sh
+      (cd /tmp && env SHELL=bash sh /tmp/install-pnpm.sh)
+    prime:
+      - -*
+
   signal-desktop:
+    after:
+      - node-runtime
     plugin: dump
     source: https://github.com/signalapp/Signal-Desktop
     source-type: git
     source-tag: v$SNAPCRAFT_PROJECT_VERSION
     build-packages:
-      - curl
       - execstack
       - git-lfs
       - jq
@@ -62,12 +77,12 @@ parts:
       - SIGNAL_ENV: "production"
       - ELECTRON_GET_USE_PROXY: "1"
     override-build: |
-      # Install pnpm and the correct version of nodejs
-      export PNPM_HOME="/root/.local/share/pnpm"
-      export PATH="$PNPM_HOME:$PATH"
+      export PNPM_HOME="${CRAFT_STAGE}/pnpm"
+      export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
       PNPM_VERSION="$(jq -r '.packageManager // empty' package.json | sed 's/pnpm@//')"
-      curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION="${PNPM_VERSION}" SHELL=bash sh -
+      pnpm self-update "${PNPM_VERSION}"
       pnpm env use --global "$(jq -r .engines.node package.json)"
+      pnpm add --global npm
 
       git lfs install
 
