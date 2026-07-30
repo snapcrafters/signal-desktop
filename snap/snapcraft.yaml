@@ -71,7 +71,6 @@ parts:
       - execstack
       - git-lfs
       - jq
-      - moreutils
       - python3
     build-environment:
       - SIGNAL_ENV: "production"
@@ -86,24 +85,35 @@ parts:
 
       git lfs install
 
-      # Build the sticker-creator
-      pnpm -C ./sticker-creator/ install
-      pnpm -C ./sticker-creator/ run build
-
       # Add a patch that fixes the rendering of images on arm64 builds.
       # See: https://github.com/snapcrafters/signal-desktop/issues/279#issuecomment-2372021170
-      cp $CRAFT_PROJECT_DIR/snap/patches/* patches/
+      cp "$CRAFT_PROJECT_DIR"/snap/patches/* patches/
 
-      # Apply patches
-      cat package.json | jq -r --arg fs_extra patches/fs-extra+11.3.4.patch '.pnpm.patchedDependencies."fs-extra@11.3.4"=$fs_extra ' | sponge package.json
-      patch -p1 <patches/production-desktop-name.patch
+      # pnpm 11 only reads patchedDependencies from pnpm-workspace.yaml. Merge
+      # our patch into Signal's existing block before any workspace install.
+      node "$CRAFT_PROJECT_DIR/snap/scripts/add-pnpm-patch.mjs"
+
+      # Apply source patches.
+      patch -p1 < patches/production-desktop-name.patch
+
+      # Build the sticker-creator
+      pnpm -C ./sticker-creator/ install --no-frozen-lockfile
+      pnpm -C ./sticker-creator/ run build
 
       # Ensure node-gyp is available for native addon builds (installed via
       # pnpm so that it lands in $PNPM_HOME, which is already on PATH).
       pnpm add -g node-gyp
 
       # Install the dependencies for the Signal-Desktop application.
-      pnpm install
+      pnpm install --no-frozen-lockfile
+
+      # Fail if pnpm silently ignores the fs-extra patch.
+      FS_EXTRA_FILE="$(node -p "require('node:path').join(require('node:path').dirname(require.resolve('fs-extra')), 'ensure/file.js')")"
+      if ! grep -Fq "most likely been created just fine" "$FS_EXTRA_FILE"; then
+        echo "ERROR: fs-extra workaround was not applied to $FS_EXTRA_FILE" >&2
+        exit 1
+      fi
+
       pnpm run generate
        
       # This is the equivalent of 'npm run build-linux' with some adjustments
