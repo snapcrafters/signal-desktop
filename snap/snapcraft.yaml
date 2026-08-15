@@ -93,6 +93,11 @@ parts:
       # our patch into Signal's existing block before any workspace install.
       node "$CRAFT_PROJECT_DIR/snap/scripts/add-pnpm-patch.mjs"
 
+      # Backport Signal's v8.24 allowance for xmldom versions already present
+      # in the v8.23 lockfile. This is a no-op once upstream includes the fix.
+      sed -i "s/'@xmldom\/xmldom': '0.8.10'/'@xmldom\/xmldom': '0.8.13 || 0.9.10'/" pnpm-workspace.yaml
+      grep -Fq "'@xmldom/xmldom': '0.8.13 || 0.9.10'" pnpm-workspace.yaml
+
       # Apply source patches.
       patch -p1 < patches/production-desktop-name.patch
 
