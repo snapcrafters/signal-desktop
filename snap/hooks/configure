@@ -12,5 +12,5 @@ fi
 
 enable_gpu="$(snapctl get enable-gpu)"
 if [[ -z "$enable_gpu" ]]; then
-    snapctl set enable-gpu=false
+    snapctl set enable-gpu=true
 fi
