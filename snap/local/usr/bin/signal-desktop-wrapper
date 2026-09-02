@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Run the configure hook which sets defaults for any config options
-"${SNAP}/meta/hooks/configure"
-
 # Grab the config options
 tray_icon="$(snapctl get tray-icon)"
 enable_gpu="$(snapctl get enable-gpu)"
@@ -30,8 +27,7 @@ if [[ "$(uname -m)" == "aarch64" ]]; then
     opts+=("--use-angle=gles")
 fi
 
-# If the rendering device string is 'llvmpipe' then it's likely that the
-# app will crash with hardware acceleration enabled.
+# Allow GPU acceleration to be disabled if the app crashes with it enabled.
 # See: https://github.com/electron/electron/issues/48321
 # See: https://github.com/snapcrafters/signal-desktop/issues/422
 if [[ "${enable_gpu}" != "true" ]]; then
