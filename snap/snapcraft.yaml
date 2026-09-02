@@ -95,16 +95,15 @@ parts:
       # Apply source patches.
       patch -p1 < patches/production-desktop-name.patch
 
-      # Build the sticker-creator
-      pnpm -C ./sticker-creator/ install --no-frozen-lockfile
-      pnpm -C ./sticker-creator/ run build
-
       # Ensure node-gyp is available for native addon builds (installed via
       # pnpm so that it lands in $PNPM_HOME, which is already on PATH).
       (cd /tmp && pnpm add -g node-gyp)
 
-      # Install the dependencies for the Signal-Desktop application.
+      # Install dependencies for the complete workspace.
       pnpm install --no-frozen-lockfile
+
+      # Build the sticker-creator for inclusion in the application.
+      pnpm -C ./sticker-creator/ run build
 
       # Fail if pnpm silently ignores the fs-extra patch.
       FS_EXTRA_FILE="$(node -p "require('node:path').join(require('node:path').dirname(require.resolve('fs-extra')), 'ensure/file.js')")"
