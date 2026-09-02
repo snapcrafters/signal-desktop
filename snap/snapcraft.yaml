@@ -15,7 +15,7 @@ description: |
 
   **Minimize to tray**
 
-  Per the request of the Signal developers, this snap does not use the system tray by default. This is disabled by default per the request of the Signal developers, because system tray support is not stable. Set to `false`, Signal will stop when you close it and will not have a system tray icon. You can enable it by running the following command.
+  Per the request of the Signal developers, this snap does not use the system tray by default because that support is not stable. Signal will stop when you close it and will not have a system tray icon. You can enable it by running the following command.
 
       snap set signal-desktop tray-icon=true
 
@@ -28,11 +28,10 @@ description: |
 
   This snap is maintained by the Snapcrafters community, and is not necessarily endorsed or officially maintained by the upstream developers.
 website: https://signal.org/
-contact: https://github.com//snapcrafters/signal-desktop/issues
-issues: https://github.com//snapcrafters/signal-desktop/issues
-source-code: https://github.com//snapcrafters/signal-desktop
+contact: https://github.com/snapcrafters/signal-desktop/issues
+issues: https://github.com/snapcrafters/signal-desktop/issues
+source-code: https://github.com/snapcrafters/signal-desktop
 license: AGPL-3.0-only
-adopt-info: signal-desktop
 icon: snap/gui/signal-desktop.png
 version: 8.25.0
 
