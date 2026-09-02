@@ -81,7 +81,10 @@ parts:
       PNPM_VERSION="$(jq -r '.packageManager // empty' package.json | sed 's/pnpm@//')"
       pnpm self-update "${PNPM_VERSION}"
       pnpm env use --global "$(jq -r .engines.node package.json)"
-      pnpm add --global npm
+      # Global installs must run outside Signal's workspace. Otherwise pnpm
+      # loads .pnpmfile.mjs, whose nested `pnpm config` call resolves the
+      # managed pnpm binary from the registry during each global install.
+      (cd /tmp && pnpm add --global npm)
 
       git lfs install
 
@@ -102,7 +105,7 @@ parts:
 
       # Ensure node-gyp is available for native addon builds (installed via
       # pnpm so that it lands in $PNPM_HOME, which is already on PATH).
-      pnpm add -g node-gyp
+      (cd /tmp && pnpm add -g node-gyp)
 
       # Install the dependencies for the Signal-Desktop application.
       pnpm install --no-frozen-lockfile
