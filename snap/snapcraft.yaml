@@ -76,7 +76,18 @@ parts:
       export PNPM_HOME="${CRAFT_STAGE}/pnpm"
       export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
       PNPM_VERSION="$(jq -r '.packageManager // empty' package.json | sed 's/pnpm@//')"
-      pnpm self-update "${PNPM_VERSION}"
+      # Run outside Signal's workspace so pnpm updates the installed CLI rather
+      # than handling the workspace's packageManager declaration.
+      (cd /tmp && pnpm self-update "${PNPM_VERSION}")
+      hash -r
+      ACTUAL_PNPM_VERSION="$(cd /tmp && pnpm --version)"
+      if [ "${ACTUAL_PNPM_VERSION}" != "${PNPM_VERSION}" ]; then
+        echo "ERROR: Expected pnpm ${PNPM_VERSION}, got ${ACTUAL_PNPM_VERSION}" >&2
+        exit 1
+      fi
+      # The required version is installed and verified above. Fail rather than
+      # downloading another pnpm if a nested invocation finds a mismatch.
+      export pnpm_config_pm_on_fail=error
       pnpm env use --global "$(jq -r .engines.node package.json)"
       # Global installs must run outside Signal's workspace. Otherwise pnpm
       # loads .pnpmfile.mjs, whose nested `pnpm config` call resolves the
