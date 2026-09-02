@@ -68,8 +68,6 @@ parts:
     source-type: git
     source-tag: v$SNAPCRAFT_PROJECT_VERSION
     build-packages:
-      - execstack
-      - git-lfs
       - jq
       - python3
     build-environment:
@@ -85,8 +83,6 @@ parts:
       # loads .pnpmfile.mjs, whose nested `pnpm config` call resolves the
       # managed pnpm binary from the registry during each global install.
       (cd /tmp && pnpm add --global npm)
-
-      git lfs install
 
       # Add a patch that fixes the rendering of images on arm64 builds.
       # See: https://github.com/snapcrafters/signal-desktop/issues/279#issuecomment-2372021170
@@ -130,9 +126,6 @@ parts:
     stage-packages:
       - libnss3
       - libnss-sss
-      # Needed for non-gpu accelerated workaround in wrapper script.
-      # See: https://github.com/electron/electron/issues/48321
-      - mesa-utils
     prime:
       - -opt/Signal/chrome-sandbox
       - -opt/Signal/resources/app.asar.unpacked/node_modules/sharp/vendor/lib
@@ -143,7 +136,7 @@ parts:
     source: ./snap/local
     source-type: local
 
-  # Needed because mesa-utils pulls in mesa libraries that conflict with the gpu-2404 interface
+  # Ensure staged Mesa libraries do not conflict with the gpu-2404 interface.
   gpu-2404:
     after:
       - signal-desktop
