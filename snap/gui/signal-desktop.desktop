@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Signal
-Exec=signal-desktop --no-sandbox %U
+Exec=signal-desktop %U
 Terminal=false
 Type=Application
 Icon=${SNAP}/meta/gui/signal-desktop.png
