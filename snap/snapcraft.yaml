@@ -33,7 +33,7 @@ issues: https://github.com/snapcrafters/signal-desktop/issues
 source-code: https://github.com/snapcrafters/signal-desktop
 license: AGPL-3.0-only
 icon: snap/gui/signal-desktop.png
-version: 8.26.0
+version: 8.27.0
 
 base: core24
 grade: stable
