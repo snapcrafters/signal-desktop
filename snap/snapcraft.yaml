@@ -94,16 +94,8 @@ parts:
       # managed pnpm binary from the registry during each global install.
       (cd /tmp && pnpm add --global npm)
 
-      # Add a patch that fixes the rendering of images on arm64 builds.
-      # See: https://github.com/snapcrafters/signal-desktop/issues/279#issuecomment-2372021170
-      cp "$CRAFT_PROJECT_DIR"/snap/patches/* patches/
-
-      # pnpm 11 only reads patchedDependencies from pnpm-workspace.yaml. Merge
-      # our patch into Signal's existing block before any workspace install.
-      node "$CRAFT_PROJECT_DIR/snap/scripts/add-pnpm-patch.mjs"
-
       # Apply source patches.
-      patch -p1 < patches/production-desktop-name.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/snap/patches/production-desktop-name.patch
 
       # Ensure node-gyp is available for native addon builds (installed via
       # pnpm so that it lands in $PNPM_HOME, which is already on PATH).
@@ -114,13 +106,6 @@ parts:
 
       # Build the sticker-creator for inclusion in the application.
       pnpm -C ./sticker-creator/ run build
-
-      # Fail if pnpm silently ignores the fs-extra patch.
-      FS_EXTRA_FILE="$(node -p "require('node:path').join(require('node:path').dirname(require.resolve('fs-extra')), 'ensure/file.js')")"
-      if ! grep -Fq "most likely been created just fine" "$FS_EXTRA_FILE"; then
-        echo "ERROR: fs-extra workaround was not applied to $FS_EXTRA_FILE" >&2
-        exit 1
-      fi
 
       pnpm run generate
        
