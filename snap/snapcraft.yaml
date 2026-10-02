@@ -75,7 +75,9 @@ parts:
     override-build: |
       export PNPM_HOME="${CRAFT_STAGE}/pnpm"
       export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
-      PNPM_VERSION="$(jq -r '.packageManager // empty' package.json | sed 's/pnpm@//')"
+      PNPM_VERSION="$(jq -er '.devEngines.packageManager
+        | select(.name == "pnpm")
+        | .version' package.json)"
       # Run outside Signal's workspace so pnpm updates the installed CLI rather
       # than handling the workspace's packageManager declaration.
       (cd /tmp && pnpm self-update "${PNPM_VERSION}")
@@ -129,6 +131,14 @@ parts:
     plugin: dump
     source: ./snap/local
     source-type: local
+    override-build: |
+      craftctl default
+      # Local source directories can inherit restrictive checkout modes, but
+      # snap payload paths must be readable and executable by every user.
+      chmod =755 \
+        "${CRAFT_PART_INSTALL}/usr" \
+        "${CRAFT_PART_INSTALL}/usr/bin" \
+        "${CRAFT_PART_INSTALL}/usr/bin/signal-desktop-wrapper"
 
 apps:
   signal-desktop:
