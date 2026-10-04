@@ -131,14 +131,6 @@ parts:
     plugin: dump
     source: ./snap/local
     source-type: local
-    override-build: |
-      craftctl default
-      # Local source directories can inherit restrictive checkout modes, but
-      # snap payload paths must be readable and executable by every user.
-      chmod =755 \
-        "${CRAFT_PART_INSTALL}/usr" \
-        "${CRAFT_PART_INSTALL}/usr/bin" \
-        "${CRAFT_PART_INSTALL}/usr/bin/signal-desktop-wrapper"
 
 apps:
   signal-desktop:
