@@ -1,0 +1,33 @@
+--- a/ts/util/os/promptOSAuthMain.main.ts
++++ b/ts/util/os/promptOSAuthMain.main.ts
+@@ -147,12 +147,17 @@
+   }
+
++  // Probe with CheckAuthorization without prompting. Snap's polkit interface
++  // permits this method, but does not permit pkaction's EnumerateActions.
++  // This only checks availability; pkcheck -u above still authenticates.
+   // Avoid string interpolation in exec() command
+   let actionCommand: string;
+   if (reason === 'enable-backups') {
+-    actionCommand = 'pkaction --action-id org.signalapp.enable-backups';
++    actionCommand =
++      'pkcheck --process $$ --action-id org.signalapp.enable-backups';
+   } else if (reason === 'view-aep') {
+-    actionCommand = 'pkaction --action-id org.signalapp.view-aep';
++    actionCommand = 'pkcheck --process $$ --action-id org.signalapp.view-aep';
+   } else if (reason === 'plaintext-export') {
+-    actionCommand = 'pkaction --action-id org.signalapp.plaintext-export';
++    actionCommand =
++      'pkcheck --process $$ --action-id org.signalapp.plaintext-export';
+   } else {
+     throw missingCaseError(reason);
+@@ -161,5 +166,8 @@
+   const isActionRegistered = await new Promise<boolean>((resolve, _reject) => {
+     exec(actionCommand).on('exit', code => {
+-      resolve(code === 0);
++      // 0: authorized; 1: denied; 2: authentication required without -u.
++      // Each means polkit recognized the action. Errors (126/127), signals,
++      // and other results fail this preflight, never granting authorization.
++      resolve(code === 0 || code === 1 || code === 2);
+     });
+   });
