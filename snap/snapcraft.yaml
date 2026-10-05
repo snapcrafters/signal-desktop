@@ -98,6 +98,7 @@ parts:
 
       # Apply source patches.
       patch -p1 < $CRAFT_PROJECT_DIR/snap/patches/production-desktop-name.patch
+      patch -p1 < "$CRAFT_PROJECT_DIR/snap/patches/snap-polkit-preflight.patch"
 
       # Ensure node-gyp is available for native addon builds (installed via
       # pnpm so that it lands in $PNPM_HOME, which is already on PATH).
@@ -119,6 +120,15 @@ parts:
       # and 'linux-arm64-unpacked' for arm64.
       mkdir -p "${CRAFT_PART_INSTALL}/opt"
       mv release/linux-*unpacked "${CRAFT_PART_INSTALL}/opt/Signal"
+    override-prime: |
+      craftctl default
+      # Use the populated, localized policies from the packaged release.
+      install -d "${CRAFT_PRIME}/meta/polkit"
+      for action in enable-backups view-aep plaintext-export; do
+        install -m 0644 \
+          "${CRAFT_PRIME}/opt/Signal/resources/org.signalapp.${action}.policy" \
+          "${CRAFT_PRIME}/meta/polkit/polkit-org-signalapp.org.signalapp.${action}.policy"
+      done
     stage-packages:
       - libnss3
       - libnss-sss
@@ -127,10 +137,27 @@ parts:
       - -opt/Signal/resources/app.asar.unpacked/node_modules/sharp/vendor/lib
       - -opt/Signal/resources/app.asar.unpacked/node_modules/sharp/vendor/include
 
+  polkit-clients:
+    plugin: nil
+    stage-packages:
+      - polkitd
+      - libpolkit-agent-1-0
+      - libpolkit-gobject-1-0
+    # Stage clients and their polkit libraries, without a second daemon.
+    stage:
+      - usr/bin/pkcheck
+      - usr/lib/*/libpolkit-agent-1.so*
+      - usr/lib/*/libpolkit-gobject-1.so*
+
   local-parts:
     plugin: dump
     source: ./snap/local
     source-type: local
+
+plugs:
+  polkit-org-signalapp:
+    interface: polkit
+    action-prefix: org.signalapp
 
 apps:
   signal-desktop:
@@ -146,5 +173,6 @@ apps:
       - removable-media
       - unity7
       - screen-inhibit-control
+      - polkit-org-signalapp
     environment:
       TMPDIR: $XDG_RUNTIME_DIR
