@@ -157,6 +157,8 @@ parts:
 plugs:
   polkit-org-signalapp:
     interface: polkit
+    # The policy files in meta/polkit use this prefix. install-rules and its
+    # sha3-384 hashes apply only to .rules files, which this snap does not ship.
     action-prefix: org.signalapp
 
 apps:
